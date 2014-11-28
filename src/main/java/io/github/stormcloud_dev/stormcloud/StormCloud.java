@@ -57,7 +57,8 @@ public class StormCloud {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        new StormCloud(11100).run();
+        System.out.println("Listening on port: " + Integer.valueOf(args[0]));
+        new StormCloud(Integer.valueOf(args[0])).run();
     }
 
 }

@@ -19,6 +19,7 @@ import io.github.stormcloud_dev.stormcloud.frame.HandshakeFrame;
 import io.github.stormcloud_dev.stormcloud.frame.itemproc.*;
 import io.github.stormcloud_dev.stormcloud.frame.serverbound.*;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
@@ -31,25 +32,35 @@ public class RORObjectDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> objects) throws Exception {
         byte[] bytes = new byte[buf.readableBytes()];
         buf.readBytes(bytes);
-        System.out.println(Arrays.toString(bytes));
+        //System.out.println(Arrays.toString(bytes));
         if (new String(bytes, "utf8").equals("GM:Studio-Connect\u0000")) {
             objects.add(new HandshakeFrame());
             return;
         }
         buf.resetReaderIndex();
         while (buf.readableBytes() > 0) {
-            Object obj = readNextObject(buf);
+            Object obj = readNextObject(buf, ctx);
             if (obj != null) {
                 objects.add(obj);
             }
         }
     }
 
-    private Object readNextObject(ByteBuf buf) {
+    private Object readNextObject(ByteBuf buf, ChannelHandlerContext ctx) {
         if (buf.readableBytes() < 12) return null;
         byte[] header = new byte[8];
         buf.readBytes(8).readBytes(header);
-        System.out.println(Arrays.toString(header));
+
+        if (!Arrays.equals(header, new byte[]{-34, -64, -83, -34, 12, 0, 0, 0})) {
+            //System.out.println(Arrays.toString(header));
+            ctx.writeAndFlush(Unpooled.wrappedBuffer(new byte[]{-83, -66, -81, -34, -21, -66, 13, -16, 12, 0, 0, 0}));
+            ctx.writeAndFlush(new SetPlayerServerBoundFrame(0.0, 0.0, "v1.2.4"));
+            ctx.writeAndFlush(new UpdateDiffServerBoundFrame((byte) 2, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0));
+            ctx.writeAndFlush(new AddPlayerServerBoundFrame(0.0, 0.0, 0.0, -1, 1, "HOST|"));
+
+            return null;
+        }
+
         int length = buf.readByte();
         buf.readBytes(3);
         byte id = buf.readByte();
@@ -60,7 +71,7 @@ public class RORObjectDecoder extends ByteToMessageDecoder {
             case 1:
                 return new SetReadyServerBoundFrame(buf.readByte());
             case 2:
-                return new SetPlayerServerBoundFrame(buf.readDouble());
+                return new SetPlayerServerBoundFrame(buf.readDouble(), buf.readDouble(), readString(buf));
             case 3:
                 return new AddPlayerServerBoundFrame(buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readInt(), buf.readInt(), readString(buf));
             case 4:

@@ -17,28 +17,49 @@ package io.github.stormcloud_dev.stormcloud.frame.serverbound;
 
 import io.netty.buffer.ByteBuf;
 
+import java.nio.ByteOrder;
+
 public class SetPlayerServerBoundFrame extends ServerBoundFrame {
 
     private double unknown;
+    private double unknown2;
+    private String version;
 
-    public SetPlayerServerBoundFrame(double unknown) {
+    public SetPlayerServerBoundFrame(double unknown, double unknown2, String version) {
         super((byte) 2);
         this.unknown = unknown;
+        this.unknown2 = unknown2;
+        this.version = version;
     }
 
     @Override
     public int getLength() {
-        return 25;
+        return 40;
     }
 
     public double getUnknown() {
         return unknown;
     }
 
+    public double getUnknown2() {
+        return unknown2;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
     @Override
     public void writeData(ByteBuf buf) {
         super.writeData(buf);
-        buf.writeDouble(getUnknown());
+        buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(15.0); //Object Index?
+        buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(0.0); //Multiplayer ID?
+        buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(3.0); //Don't know?
+        buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(40.0); //Don't know?
+        for (byte b : getVersion().getBytes()) {
+            buf.writeByte(b);
+        }
+        buf.writeByte(0);
     }
 
 }

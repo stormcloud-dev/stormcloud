@@ -15,7 +15,6 @@
  */
 package io.github.stormcloud_dev.stormcloud;
 
-import io.github.stormcloud_dev.stormcloud.frame.HandshakeFrame;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
@@ -45,9 +44,9 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         System.out.println(msg.getClass().getSimpleName());
-        if (msg instanceof HandshakeFrame) {
-            ctx.writeAndFlush(Unpooled.wrappedBuffer(new byte[]{-83, -66, -81, -34, -21, -66, 13, -16, 12, 0, 0, 0}));
-        }
+//        if (msg instanceof HandshakeFrame) {
+//            ctx.writeAndFlush(Unpooled.wrappedBuffer(new byte[]{-83, -66, -81, -34, -21, -66, 13, -16, 12, 0, 0, 0}));
+//        }
 //        if (msg instanceof ByteBuf) {
 //            ByteBuf buf = (ByteBuf) msg;
 //            byte[] bytes = new byte[buf.readableBytes()];
