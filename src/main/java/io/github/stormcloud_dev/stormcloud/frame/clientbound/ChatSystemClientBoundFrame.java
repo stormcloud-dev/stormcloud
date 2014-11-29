@@ -16,6 +16,7 @@
 package io.github.stormcloud_dev.stormcloud.frame.clientbound;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 
 public class ChatSystemClientBoundFrame extends ClientBoundFrame {
 
@@ -42,8 +43,8 @@ public class ChatSystemClientBoundFrame extends ClientBoundFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf) {
-        super.writeData(buf);
+    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
+        super.writeData(buf, ctx);
         buf.writeByte(getIsItemChat());
         for (byte b : getText().getBytes()) {
             buf.writeByte(b);

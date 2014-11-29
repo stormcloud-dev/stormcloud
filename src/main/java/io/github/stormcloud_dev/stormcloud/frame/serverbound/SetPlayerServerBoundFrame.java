@@ -16,6 +16,7 @@
 package io.github.stormcloud_dev.stormcloud.frame.serverbound;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 
 import java.nio.ByteOrder;
 
@@ -50,8 +51,8 @@ public class SetPlayerServerBoundFrame extends ServerBoundFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf) {
-        super.writeData(buf);
+    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
+        super.writeData(buf); //For some reason the object index has to be 15, so we don't send the player info
         buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(15.0); //Object Index?
         buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(0.0); //Multiplayer ID?
         buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(3.0); //Don't know?

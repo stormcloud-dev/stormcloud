@@ -16,6 +16,7 @@
 package io.github.stormcloud_dev.stormcloud.frame.serverbound;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 
 public class CreateSlimeServerBoundFrame extends ServerBoundFrame {
 
@@ -84,8 +85,8 @@ public class CreateSlimeServerBoundFrame extends ServerBoundFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf) {
-        super.writeData(buf);
+    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
+        super.writeData(buf, ctx);
         buf.writeShort(getX());
         buf.writeShort(getY());
         buf.writeFloat(getSize());

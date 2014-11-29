@@ -16,7 +16,12 @@
 package io.github.stormcloud_dev.stormcloud.frame.serverbound;
 
 import io.github.stormcloud_dev.stormcloud.CrewMember;
+import io.github.stormcloud_dev.stormcloud.Player;
+import io.github.stormcloud_dev.stormcloud.StormCloudHandler;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+
+import java.nio.ByteOrder;
 
 public class UpdatePlayerServerBoundFrame extends ServerBoundFrame {
 
@@ -63,11 +68,17 @@ public class UpdatePlayerServerBoundFrame extends ServerBoundFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf) {
-        super.writeData(buf);
-        buf.writeInt(getClazz());
-        buf.writeDouble(getX());
-        buf.writeDouble(getY());
+    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
+        super.writeData(buf, ctx);
+
+        Player player = ctx.channel().attr(StormCloudHandler.PLAYER).get();
+        player.setName(getName());
+        player.setClazz(CrewMember.values()[getClazz()]);
+        ctx.attr(StormCloudHandler.PLAYER).set(player);
+
+        buf.order(ByteOrder.LITTLE_ENDIAN).writeInt(getClazz());
+        buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(getX());
+        buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(getY());
         for (byte b : getName().getBytes()) {
             buf.writeByte(b);
         }

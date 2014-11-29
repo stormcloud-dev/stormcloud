@@ -25,7 +25,14 @@ public class RORObjectEncoder extends MessageToByteEncoder<Frame> {
     @Override
     protected void encode(ChannelHandlerContext ctx, Frame frame, ByteBuf buf) throws Exception {
         buf.writeBytes(new byte[] {-34, -64, -83, -34, 12, 0, 0, 0}); // GM:Studio header
-        frame.writeData(buf); // frame data - dependent on frame
+
+        //System.out.println("ENCODING: " + frame.getClass().getSimpleName());
+        try {
+            frame.writeData(buf, ctx); // frame data - dependent on frame
+        } catch(Exception e) {
+            System.out.println(e.toString());
+        }
+        //System.out.println("SEND...");
     }
 
 }

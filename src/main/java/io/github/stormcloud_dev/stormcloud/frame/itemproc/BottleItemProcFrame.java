@@ -16,6 +16,7 @@
 package io.github.stormcloud_dev.stormcloud.frame.itemproc;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 
 public class BottleItemProcFrame extends ItemProcFrame {
 
@@ -54,8 +55,8 @@ public class BottleItemProcFrame extends ItemProcFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf) {
-        super.writeData(buf);
+    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
+        super.writeData(buf, ctx);
         buf.writeDouble(getX());
         buf.writeDouble(getY());
         buf.writeDouble(getDamage());

@@ -1,3 +1,5 @@
+package io.github.stormcloud_dev.stormcloud;
+
 /*
  *   Copyright 2014 StormCloud Development Group
  *
@@ -13,36 +15,43 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package io.github.stormcloud_dev.stormcloud.frame.clientbound;
 
-import io.github.stormcloud_dev.stormcloud.frame.Frame;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
+public class Player {
 
-public abstract class ClientBoundFrame extends Frame {
+    private double MId, objectIndex;
 
-    private double objectIndex;
-    private double multiplayerId;
+    private String name;
 
-    public ClientBoundFrame(byte id, double objectIndex, double multiplayerId) {
-        super(id);
+    private CrewMember clazz;
+
+    public Player(double MId, double objectIndex) {
+        this.MId = MId;
         this.objectIndex = objectIndex;
-        this.multiplayerId = multiplayerId;
+        this.clazz = CrewMember.COMMANDO;
+        this.name = "Anonymous";
+    }
+
+    public double getMId() {
+        return MId;
     }
 
     public double getObjectIndex() {
         return objectIndex;
     }
 
-    public double getMultiplayerId() {
-        return multiplayerId;
+    public String getName() {
+        return name;
     }
 
-    @Override
-    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
-        super.writeData(buf, ctx);
-        buf.writeDouble(getObjectIndex());
-        buf.writeDouble(getMultiplayerId());
+    public void setName(String name) {
+        this.name = name;
     }
 
+    public CrewMember getClazz() {
+        return clazz;
+    }
+
+    public void setClazz(CrewMember clazz) {
+        this.clazz = clazz;
+    }
 }

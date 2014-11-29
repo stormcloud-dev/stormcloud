@@ -17,6 +17,7 @@ package io.github.stormcloud_dev.stormcloud.frame.clientbound;
 
 import io.github.stormcloud_dev.stormcloud.CrewMember;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 
 public class UpdatePlayerClientBoundFrame extends ClientBoundFrame {
 
@@ -63,8 +64,8 @@ public class UpdatePlayerClientBoundFrame extends ClientBoundFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf) {
-        super.writeData(buf);
+    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
+        super.writeData(buf, ctx);
         buf.writeInt(getClazz());
         buf.writeDouble(getX());
         buf.writeDouble(getY());

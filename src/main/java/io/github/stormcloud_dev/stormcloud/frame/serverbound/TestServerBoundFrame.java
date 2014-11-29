@@ -23,7 +23,7 @@ public class TestServerBoundFrame extends ServerBoundFrame {
 
     @Override
     public int getLength() {
-        return 17;
+        return 1;
     }
 
 }
