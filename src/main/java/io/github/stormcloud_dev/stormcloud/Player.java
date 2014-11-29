@@ -15,19 +15,29 @@
  */
 package io.github.stormcloud_dev.stormcloud;
 
+import static java.lang.Math.max;
+import static java.lang.System.currentTimeMillis;
+
 public class Player {
 
     private double MId, objectIndex;
 
     private String name;
-
+    private String login;
     private CrewMember clazz;
+    private long zCooldown;
+    private long xCooldown;
+    private long cCooldown;
+    private long vCooldown;
+    private long lastPing;
+    private boolean ready;
 
     public Player(double MId, double objectIndex) {
         this.MId = MId;
         this.objectIndex = objectIndex;
         this.clazz = CrewMember.COMMANDO;
-        this.name = "Anonymous";
+        this.name = "Player";
+        this.login = "";
     }
 
     public double getMId() {
@@ -46,6 +56,14 @@ public class Player {
         this.name = name;
     }
 
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
     public CrewMember getClazz() {
         return clazz;
     }
@@ -53,4 +71,57 @@ public class Player {
     public void setClazz(CrewMember clazz) {
         this.clazz = clazz;
     }
+
+    public long getZCooldown() {
+        return max(zCooldown - currentTimeMillis(), 0);
+    }
+
+    public void setZCooldown(long millis) {
+        zCooldown = currentTimeMillis() + millis;
+    }
+
+    public long getXCooldown() {
+        return max(xCooldown - currentTimeMillis(), 0);
+    }
+
+    public void setXCooldown(long millis) {
+        xCooldown = currentTimeMillis() + millis;
+    }
+
+    public long getCCooldown() {
+        return max(cCooldown - currentTimeMillis(), 0);
+    }
+
+    public void setCCooldown(long millis) {
+        cCooldown = currentTimeMillis() + millis;
+    }
+
+    public long getVCooldown() {
+        return max(vCooldown - currentTimeMillis(), 0);
+    }
+
+    public void setVCooldown(long millis) {
+        vCooldown = currentTimeMillis() + millis;
+    }
+
+    public long getPing() {
+        return max(currentTimeMillis() - lastPing, 0);
+    }
+
+    public void setPing(long millis) {
+        lastPing = currentTimeMillis() + millis;
+    }
+
+    public void setLastPing(long lastPing) {
+        this.lastPing = lastPing;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
+    }
+
 }
