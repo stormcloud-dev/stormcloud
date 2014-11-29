@@ -1,5 +1,3 @@
-package io.github.stormcloud_dev.stormcloud;
-
 /*
  *   Copyright 2014 StormCloud Development Group
  *
@@ -15,6 +13,7 @@ package io.github.stormcloud_dev.stormcloud;
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+package io.github.stormcloud_dev.stormcloud;
 
 public class Player {
 
