@@ -15,6 +15,11 @@
  */
 package io.github.stormcloud_dev.stormcloud;
 
+import io.github.stormcloud_dev.stormcloud.frame.HandshakeFrame;
+import io.github.stormcloud_dev.stormcloud.frame.serverbound.AddPlayerServerBoundFrame;
+import io.github.stormcloud_dev.stormcloud.frame.serverbound.LagPlayerServerBoundFrame;
+import io.github.stormcloud_dev.stormcloud.frame.serverbound.SetPlayerServerBoundFrame;
+import io.github.stormcloud_dev.stormcloud.frame.serverbound.UpdateDiffServerBoundFrame;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
@@ -44,9 +49,14 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         System.out.println(msg.getClass().getSimpleName());
-//        if (msg instanceof HandshakeFrame) {
-//            ctx.writeAndFlush(Unpooled.wrappedBuffer(new byte[]{-83, -66, -81, -34, -21, -66, 13, -16, 12, 0, 0, 0}));
-//        }
+
+        if (msg instanceof HandshakeFrame) {
+            ctx.writeAndFlush(Unpooled.wrappedBuffer(new byte[]{-83, -66, -81, -34, -21, -66, 13, -16, 12, 0, 0, 0}));
+            ctx.writeAndFlush(new SetPlayerServerBoundFrame(0.0, 0.0, "v1.2.4"));
+            ctx.writeAndFlush(new UpdateDiffServerBoundFrame((byte) 2, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0));
+            ctx.writeAndFlush(new AddPlayerServerBoundFrame(0.0, 0.0, 0.0, -1, 1, "HOST|"));
+            ctx.writeAndFlush(new LagPlayerServerBoundFrame(""));
+        }
 //        if (msg instanceof ByteBuf) {
 //            ByteBuf buf = (ByteBuf) msg;
 //            byte[] bytes = new byte[buf.readableBytes()];

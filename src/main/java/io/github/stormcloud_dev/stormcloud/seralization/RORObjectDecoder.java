@@ -25,6 +25,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class RORObjectDecoder extends ByteToMessageDecoder {
 
@@ -32,38 +33,45 @@ public class RORObjectDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> objects) throws Exception {
         byte[] bytes = new byte[buf.readableBytes()];
         buf.readBytes(bytes);
-        //System.out.println(Arrays.toString(bytes));
-        if (new String(bytes, "utf8").equals("GM:Studio-Connect\u0000")) {
-            objects.add(new HandshakeFrame());
-            return;
-        }
+
         buf.resetReaderIndex();
         while (buf.readableBytes() > 0) {
-            Object obj = readNextObject(buf, ctx);
+            Object obj = readNextObject(buf);
+
             if (obj != null) {
                 objects.add(obj);
             }
         }
     }
 
-    private Object readNextObject(ByteBuf buf, ChannelHandlerContext ctx) {
-        if (buf.readableBytes() < 12) return null;
+    private Object readNextObject(ByteBuf buf) {
+
+        if (buf.readableBytes() < 12) {
+            return null;
+        }
+
         byte[] header = new byte[8];
+        int readerStartIndex = buf.readerIndex(), writerStartIndex = buf.writerIndex(); //Reader Index right before we start reading the header
         buf.readBytes(8).readBytes(header);
 
-        if (!Arrays.equals(header, new byte[]{-34, -64, -83, -34, 12, 0, 0, 0})) {
-            //System.out.println(Arrays.toString(header));
-            ctx.writeAndFlush(Unpooled.wrappedBuffer(new byte[]{-83, -66, -81, -34, -21, -66, 13, -16, 12, 0, 0, 0}));
-            ctx.writeAndFlush(new SetPlayerServerBoundFrame(0.0, 0.0, "v1.2.4"));
-            ctx.writeAndFlush(new UpdateDiffServerBoundFrame((byte) 2, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0));
-            ctx.writeAndFlush(new AddPlayerServerBoundFrame(0.0, 0.0, 0.0, -1, 1, "HOST|"));
+        if (buf.readableBytes() == 8) {
+            int readerHeaderIndex = buf.readerIndex(), writerHeaderIndex = buf.writerIndex(); //Reader Index after the header
+            buf.setIndex(readerStartIndex, writerHeaderIndex); //We jump back to the index before the header
 
-            return null;
+            byte[] message = new byte[16];
+            buf.readBytes(16).readBytes(message); //We reade the whole authentication packet
+
+            if (!Arrays.equals(message, new byte[]{-66, -70, -2, -54, 11, -80, -83, -34, 16, 0, 0, 0, 0, -75, 18, 0})) {
+                return new HandshakeFrame();
+            }
+
+            buf.setIndex(readerHeaderIndex, writerStartIndex); //If it wasn't the authentication packet we jump back to the reader index behind the header
         }
 
         int length = buf.readByte();
         buf.readBytes(3);
         byte id = buf.readByte();
+        System.out.println("Received: " + id);
         switch (id) {
             case 0:
                 if (length < 39) return null;
