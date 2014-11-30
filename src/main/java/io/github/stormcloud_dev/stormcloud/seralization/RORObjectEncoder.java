@@ -16,9 +16,13 @@
 package io.github.stormcloud_dev.stormcloud.seralization;
 
 import io.github.stormcloud_dev.stormcloud.frame.Frame;
+import io.github.stormcloud_dev.stormcloud.frame.clientbound.LagPlayerClientBoundFrame;
+import io.github.stormcloud_dev.stormcloud.frame.clientbound.TestClientBoundFrame;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+
+import java.util.Arrays;
 
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -34,7 +38,16 @@ public class RORObjectEncoder extends MessageToByteEncoder<Frame> {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        //System.out.println("SEND...");
+
+        if(!(frame instanceof TestClientBoundFrame) && !(frame instanceof LagPlayerClientBoundFrame)) {
+            // Print packets for debugging
+            int readerIndex = buf.readerIndex(), writerIndex = buf.writerIndex();
+            byte[] bytes = new byte[buf.readableBytes()];
+            buf.readBytes(buf.readableBytes()).readBytes(bytes);
+            buf.setIndex(readerIndex, writerIndex);
+            System.out.println("SEND " + frame.getClass().getSimpleName() + " TO " + ctx.channel().remoteAddress() + " - " + Arrays.toString(bytes));
+        }
+
     }
 
 }

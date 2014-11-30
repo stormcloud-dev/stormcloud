@@ -32,7 +32,7 @@ public class SetPlayerClientBoundFrame extends ClientBoundFrame {
 
     @Override
     public int getLength() {
-        return 25;
+        return 40;
     }
 
     public double getUnknown1() {
@@ -56,8 +56,6 @@ public class SetPlayerClientBoundFrame extends ClientBoundFrame {
 //            buf.writeByte(b);
 //        }
 //        buf.writeByte(0);
-        buf.writeDouble(15.0); //Object Index?
-        buf.writeDouble(0.0); //Multiplayer ID?
         buf.writeDouble(3.0); //Don't know?
         buf.writeDouble(40.0); //Don't know?
         for (byte b : getVersion().getBytes()) {

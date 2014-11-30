@@ -70,6 +70,7 @@ public class RORObjectDecoder extends ByteToMessageDecoder {
         buf.setIndex(readerIndex, writerIndex);
         System.out.println(Arrays.toString(bytes)); */
 
+
         int length = buf.readByte();
         buf.readBytes(3);
         byte id = buf.readByte();

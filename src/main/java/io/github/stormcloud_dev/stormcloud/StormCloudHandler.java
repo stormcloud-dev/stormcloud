@@ -16,10 +16,11 @@
 package io.github.stormcloud_dev.stormcloud;
 
 import io.github.stormcloud_dev.stormcloud.frame.HandshakeFrame;
-import io.github.stormcloud_dev.stormcloud.frame.clientbound.SetPlayerClientBoundFrame;
-import io.github.stormcloud_dev.stormcloud.frame.clientbound.TestClientBoundFrame;
-import io.github.stormcloud_dev.stormcloud.frame.clientbound.UpdateDiffClientBoundFrame;
-import io.github.stormcloud_dev.stormcloud.frame.serverbound.AddPlayerServerBoundFrame;
+import io.github.stormcloud_dev.stormcloud.frame.clientbound.*;
+import io.github.stormcloud_dev.stormcloud.frame.serverbound.ChatPlayerServerBoundFrame;
+import io.github.stormcloud_dev.stormcloud.frame.serverbound.LagPlayerServerBoundFrame;
+import io.github.stormcloud_dev.stormcloud.frame.serverbound.SetReadyServerBoundFrame;
+import io.github.stormcloud_dev.stormcloud.frame.serverbound.UpdatePlayerServerBoundFrame;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerAdapter;
@@ -48,20 +49,27 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
         this.server = server;
     }
 
+    public void scheduleTestPacket(Channel channel) {
+        server.getTimer().newTimeout(timeout -> {
+            Player player = channel.attr(StormCloudHandler.PLAYER).get();
+            if (channel.isActive()) {
+                channel.writeAndFlush(new TestClientBoundFrame(player.getObjectIndex(), player.getMId()));
+                scheduleTestPacket(channel);
+            }
+        }, 1, SECONDS);
+    }
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("Channel active");
         Random random = new Random();
-        ctx.channel().attr(StormCloudHandler.PLAYER).set(new Player(random.nextInt(), random.nextInt()));
+        ctx.channel().attr(StormCloudHandler.PLAYER).set(new Player(random.nextInt(), 210.0));
         channels.add(ctx.channel());
         ctx.writeAndFlush(Unpooled.wrappedBuffer("GM:Studio-Connect\u0000".getBytes("utf8")));
         //Thread that tests if the connection is alive (The client needs that, else it will disconnect)
         Thread testThread = new Thread(() -> {
             Channel channel = ctx.channel();
-            server.getTimer().newTimeout(timeout -> {
-                Player player = ctx.channel().attr(StormCloudHandler.PLAYER).get();
-                if (channel.isActive()) channel.writeAndFlush(new TestClientBoundFrame(player.getObjectIndex(), player.getMId()));
-            }, 1, SECONDS);
+            scheduleTestPacket(channel);
         });
         testThread.start();
     }
@@ -73,21 +81,40 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (msg instanceof HandshakeFrame) {
-            Player sender = ctx.channel().attr(PLAYER).get();
+
+        Player sender = ctx.channel().attr(PLAYER).get();
+        if(msg instanceof HandshakeFrame) {
             ctx.writeAndFlush(Unpooled.wrappedBuffer(new byte[]{-83, -66, -81, -34, -21, -66, 13, -16, 12, 0, 0, 0}));
-            ctx.writeAndFlush(new SetPlayerClientBoundFrame(sender.getObjectIndex(), sender.getMId(), 0.0, 0.0, "v1.2.4"));
-            ctx.writeAndFlush(new UpdateDiffClientBoundFrame(sender.getObjectIndex(), sender.getMId(), (byte) 2, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0));
+            ctx.writeAndFlush(new SetPlayerClientBoundFrame(15.0, 0.0, 0.0, 0.0, "v1.2.4"));
+            ctx.writeAndFlush(new UpdateDiffClientBoundFrame(0.0, 0.0, (byte) 2, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0));
             //ctx.writeAndFlush(new AddPlayerServerBoundFrame(0.0, 0.0, 0.0, -1, 1, "HOST|"));
             channels.stream().filter(channel -> !channel.equals(ctx.channel())).forEach(channel -> {
-                Player player = ctx.channel().attr(StormCloudHandler.PLAYER).get();
-                channel.writeAndFlush(new AddPlayerServerBoundFrame(0.0, 0.0, player.getMId(), player.getClazz(), 1, player.getName()));
+                Player currentPlayer = channel.attr(StormCloudHandler.PLAYER).get();
+                ctx.channel().writeAndFlush(new AddPlayerClientBoundFrame(currentPlayer.getObjectIndex(), currentPlayer.getMId(), 0.0, 0.0, currentPlayer.getMId(), currentPlayer.getClazz(), 0, currentPlayer.getName()));
+                channel.writeAndFlush(new AddPlayerClientBoundFrame(sender.getObjectIndex(), sender.getMId(), 0.0, 0.0, sender.getMId(), sender.getClazz(), 0, sender.getName()));
             });
-        } else {
+        } else if(msg instanceof ChatPlayerServerBoundFrame) {
             channels.stream().filter(channel -> !channel.equals(ctx.channel())).forEach(channel -> {
-                channel.writeAndFlush(msg);
+                channel.writeAndFlush(new ChatPlayerClientBoundFrame(sender.getObjectIndex(), sender.getMId(), ((ChatPlayerServerBoundFrame)msg).getText()));
+            });
+        } else if(msg instanceof UpdatePlayerServerBoundFrame) {
+            UpdatePlayerServerBoundFrame serverFrame = ((UpdatePlayerServerBoundFrame)msg);
+            channels.stream().filter(channel -> !channel.equals(ctx.channel())).forEach(channel -> {
+                channel.writeAndFlush(new UpdatePlayerClientBoundFrame(sender.getObjectIndex(), sender.getMId(), serverFrame.getClazz(), serverFrame.getX(), serverFrame.getY(), serverFrame.getName()));
+            });
+        } else if(msg instanceof LagPlayerServerBoundFrame) {
+            channels.stream().filter(channel -> !channel.equals(ctx.channel())).forEach(channel -> {
+                channel.writeAndFlush(new LagPlayerClientBoundFrame(sender.getObjectIndex(), sender.getMId(), ((LagPlayerServerBoundFrame)msg).getPlayerName()));
+            });
+        } else if(msg instanceof SetReadyServerBoundFrame) {
+            channels.stream().filter(channel -> !channel.equals(ctx.channel())).forEach(channel -> {
+                channel.writeAndFlush(new SetReadyClientBoundFrame(sender.getObjectIndex(), sender.getMId(), ((SetReadyServerBoundFrame)msg).getReady()));
             });
         }
+            //channels.stream().filter(channel -> !channel.equals(ctx.channel())).forEach(channel -> {
+                //channel.writeAndFlush(msg);
+            //});
+
 //        if (msg instanceof ByteBuf) {
 //            ByteBuf buf = (ByteBuf) msg;
 //            byte[] bytes = new byte[buf.readableBytes()];
