@@ -26,20 +26,17 @@ import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static io.github.stormcloud_dev.stormcloud.Attribute.PLAYER;
 import static io.netty.channel.ChannelHandler.Sharable;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Sharable
 public class StormCloudHandler extends ChannelHandlerAdapter {
-
-    public static final AttributeKey<Player> PLAYER =
-            AttributeKey.valueOf(StormCloudHandler.class, "PLAYER");
 
     private ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     public ChannelGroup getChannels() {
@@ -115,7 +112,7 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
 
     //The id is the start id, if its used it checks the next
     public double getPlayerId(Double id, String ip) {
-        if (disconnectedPlayerList.contains(ip)) {
+        if (disconnectedPlayerList.containsKey(ip)) {
             return disconnectedPlayerList.get(ip).getMId();
         }
         return getPlayerId(id);

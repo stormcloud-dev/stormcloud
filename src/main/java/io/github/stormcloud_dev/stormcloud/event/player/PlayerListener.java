@@ -21,6 +21,8 @@ import io.github.stormcloud_dev.stormcloud.frame.clientbound.*;
 
 import java.util.Map;
 
+import static io.github.stormcloud_dev.stormcloud.Attribute.PLAYER;
+
 public class PlayerListener {
 
     private StormCloud server;
@@ -44,12 +46,12 @@ public class PlayerListener {
         }
 
         if (ingame) { //When we are ingame, players have to take the slots of left players (Can't add new players)
-            server.getChannels().stream().filter(channel -> channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
+            server.getChannels().stream().filter(channel -> channel.attr(PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
                 channel.writeAndFlush(new CrewChoiceClientBoundFrame(0.0, 0.0, (short) 2));
                 channel.writeAndFlush(new TransportClientBoundFrame(0.0, 0.0, 23.0, event.getPlayer().getX(), event.getPlayer().getY(), 2440.0, 832.0, (byte) 0));
                 //We have to update the positions of the other players if we join mid game
-                server.getChannels().stream().filter(playerChannel -> !playerChannel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(playerChannel -> {
-                    Player player = playerChannel.attr(StormCloudHandler.PLAYER).get();
+                server.getChannels().stream().filter(playerChannel -> !playerChannel.attr(PLAYER).get().equals(event.getPlayer())).forEach(playerChannel -> {
+                    Player player = playerChannel.attr(PLAYER).get();
                     channel.writeAndFlush(new PositionInfoClientBoundFrame(167.0, player.getMId(), player.getX(), player.getY(), (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0));
 
                 });
@@ -58,7 +60,7 @@ public class PlayerListener {
             System.out.println("All players are ready... game starting!");
             //Random random = new Random();
             server.getChannels().stream().forEach(channel -> {
-                //Player player = channel.attr(StormCloudHandler.PLAYER).get();
+                //Player player = channel.attr(PLAYER).get();
                 //TODO: Level generation
                 channel.writeAndFlush(new CrewChoiceClientBoundFrame(0.0, 0.0, (short) 2));
                 //First double = 40 means lobby
@@ -68,7 +70,7 @@ public class PlayerListener {
             });
             this.ingame = true;
         } else { //Telling the other clients that someone pressed ready
-            server.getChannels().stream().filter(channel -> !channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
+            server.getChannels().stream().filter(channel -> !channel.attr(PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
                 channel.writeAndFlush(new SetReadyClientBoundFrame(event.getPlayer().getObjectIndex(), event.getPlayer().getMId(), (byte)(event.getPlayer().isReady()?1:0)));
             });
         }
@@ -79,9 +81,9 @@ public class PlayerListener {
         System.out.println(event.getPlayer().getName() + " joined the game!");
         server.getPlayers().put(event.getPlayer().getMId(), event.getPlayer());
         server.getChannels().stream().forEach(channel -> { //Telling the clients that there's a new player and informing the new player about current players
-            if (channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())) { //Sending the new player, which players are already in the game
+            if (channel.attr(PLAYER).get().equals(event.getPlayer())) { //Sending the new player, which players are already in the game
                 server.getChannels().stream().filter(playerChannel -> !playerChannel.equals(channel)).forEach(playerChannel -> {
-                    Player currentPlayer = playerChannel.attr(StormCloudHandler.PLAYER).get();
+                    Player currentPlayer = playerChannel.attr(PLAYER).get();
                     channel.writeAndFlush(new AddPlayerClientBoundFrame(currentPlayer.getObjectIndex(), currentPlayer.getMId(), 0.0, 0.0, currentPlayer.getMId(), currentPlayer.getClazz(), 0, currentPlayer.getName()));
                 });
              } else { //Sending each player that a new player joined the game
@@ -93,7 +95,7 @@ public class PlayerListener {
     @EventHandler
     public void onPlayerRemove(PlayerRemoveEvent event) {
         System.out.println(event.getPlayer().getName() + " left the game!");
-        server.getChannels().stream().filter(channel -> !channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
+        server.getChannels().stream().filter(channel -> !channel.attr(PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
             channel.writeAndFlush(new DisPlayerClientBoundFrame(event.getPlayer().getObjectIndex(), event.getPlayer().getMId()));
             channel.writeAndFlush(new ChatPlayerClientBoundFrame(event.getPlayer().getObjectIndex(), 0.0, "'" + event.getPlayer().getName() + "' has left the game!"));
         });
@@ -115,7 +117,7 @@ public class PlayerListener {
                         ingame = false;
                     }
                     server.getChannels().stream().forEach(channel -> {
-                        Player player = channel.attr(StormCloudHandler.PLAYER).get();
+                        Player player = channel.attr(PLAYER).get();
                         //TODO: Level generation
                         //channel.writeAndFlush(new CrewChoiceClientBoundFrame(0.0, 0.0, (short) 2));
                         //First double = 40 means lobby
@@ -131,7 +133,7 @@ public class PlayerListener {
                 String[] spawnInfo = event.getMessage().split(" ");
                 if (spawnInfo.length == 7) {
                     server.getChannels().stream().forEach(channel -> {
-                        Player player = channel.attr(StormCloudHandler.PLAYER).get();
+                        Player player = channel.attr(PLAYER).get();
                         channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, 0.0, Short.valueOf(spawnInfo[2]), event.getPlayer().getX(), event.getPlayer().getY(), (Short.valueOf(spawnInfo[3]) == 1 ? (byte) 1 : (byte) 0), Short.valueOf(spawnInfo[4]), Short.valueOf(spawnInfo[5]), Short.valueOf(spawnInfo[6])));
                     });
                 }
@@ -170,7 +172,7 @@ public class PlayerListener {
                 });
                 break;
             default:
-                server.getChannels().stream().filter(channel -> !channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
+                server.getChannels().stream().filter(channel -> !channel.attr(PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
                     channel.writeAndFlush(new ChatPlayerClientBoundFrame(event.getPlayer().getObjectIndex(), event.getPlayer().getMId(), event.getMessage()));
                 });
                 break;
@@ -180,7 +182,7 @@ public class PlayerListener {
 
     @EventHandler
     public void onPlayerLag(PlayerLagEvent event) {
-        server.getChannels().stream().filter(channel -> !channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
+        server.getChannels().stream().filter(channel -> !channel.attr(PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
             channel.writeAndFlush(new LagPlayerClientBoundFrame(event.getPlayer().getObjectIndex(), event.getPlayer().getMId(), event.getPlayer().getName()));
         });
     }
@@ -190,7 +192,7 @@ public class PlayerListener {
         //System.out.println(event.getPlayer().getName() + " moves to " + event.getFrame().getX() + "/" + event.getFrame().getY());
         event.getPlayer().setX(event.getFrame().getX());
         event.getPlayer().setY(event.getFrame().getY());
-        server.getChannels().stream().filter(channel -> !channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
+        server.getChannels().stream().filter(channel -> !channel.attr(PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
             //Object Index of 167 required (seems to be the index for position updates)
             channel.writeAndFlush(new PositionInfoClientBoundFrame(167.0, event.getPlayer().getMId(), event.getFrame().getX(), event.getFrame().getY(), event.getFrame().getLeft(), event.getFrame().getRight(), event.getFrame().getJump(), event.getFrame().getJumpHeld(), event.getFrame().getUp(), event.getFrame().getDown()));
         });
@@ -198,7 +200,7 @@ public class PlayerListener {
 
     @EventHandler
     public void onPlayerKey(PlayerKeyEvent event) {
-        server.getChannels().stream().filter(channel -> !channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
+        server.getChannels().stream().filter(channel -> !channel.attr(PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
             //Object Index of 167 required (seems to be the index for position updates)
             channel.writeAndFlush(new KeyPlayerClientBoundFrame(167.0, event.getPlayer().getMId(), event.getFrame().getX(), event.getFrame().getY(), event.getFrame().getZAction(), event.getFrame().getXAction(), event.getFrame().getCAction(), event.getFrame().getVAction(), event.getFrame().getItemUsed(), event.getFrame().getUnknown()));
         });
@@ -218,7 +220,7 @@ public class PlayerListener {
                     server.getDisconnectedPlayers().remove(event.getPlayer().getLogin());
                 }
                 //Only to the new player
-                server.getChannels().stream().filter(channel -> channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
+                server.getChannels().stream().filter(channel -> channel.attr(PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
                     //We have to update the positions of the other players if we join mid game
                     server.getPlayers().entrySet().stream().filter(entry -> !entry.getValue().equals(event.getPlayer())).forEach(entry -> {
                         Player player = entry.getValue();
@@ -250,7 +252,7 @@ public class PlayerListener {
         }
         System.out.println(event.getPlayer().getName() + " changed clazz to " + event.getFrame().getClazz());
         event.getPlayer().setClazz((event.getFrame().getClazz() != -1 ? CrewMember.values()[event.getFrame().getClazz()] : null));
-        server.getChannels().stream().filter(channel -> !channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
+        server.getChannels().stream().filter(channel -> !channel.attr(PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
             //Object Index of 210 required (seems to be the index for player updates)
             channel.writeAndFlush(new UpdatePlayerClientBoundFrame(210.0, event.getPlayer().getMId(), event.getFrame().getClazz(), event.getFrame().getX(), event.getFrame().getY(), event.getFrame().getName()));
         });
