@@ -18,8 +18,6 @@ package io.github.stormcloud_dev.stormcloud.frame.serverbound;
 import io.github.stormcloud_dev.stormcloud.CrewMember;
 import io.netty.buffer.ByteBuf;
 
-import java.nio.ByteOrder;
-
 public class UpdatePlayerServerBoundFrame extends ServerBoundFrame {
 
     private int clazz;
@@ -67,9 +65,9 @@ public class UpdatePlayerServerBoundFrame extends ServerBoundFrame {
     @Override
     public void writeData(ByteBuf buf) {
         super.writeData(buf);
-        buf.order(ByteOrder.LITTLE_ENDIAN).writeInt(getClazz());
-        buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(getX());
-        buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(getY());
+        buf.writeInt(getClazz());
+        buf.writeDouble(getX());
+        buf.writeDouble(getY());
         for (byte b : getName().getBytes()) {
             buf.writeByte(b);
         }

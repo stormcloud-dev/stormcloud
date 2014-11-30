@@ -16,7 +16,6 @@
 package io.github.stormcloud_dev.stormcloud.frame.serverbound;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
 
 public class UpdateDiffServerBoundFrame extends ServerBoundFrame {
 
@@ -105,8 +104,8 @@ public class UpdateDiffServerBoundFrame extends ServerBoundFrame {
     @Override
     public void writeData(ByteBuf buf) {
         super.writeData(buf);
-        //buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(0.0); //Unknown Double
-        //buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(0.0); //Uknown Double
+        //buf.writeDouble(0.0); //Unknown Double
+        //buf.writeDouble(0.0); //Uknown Double
         buf.writeByte(getDiffLevel());
         buf.writeByte(getForceItemSharing());
         buf.writeByte(getHonorActive());

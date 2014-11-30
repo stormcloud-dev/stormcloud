@@ -20,6 +20,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
+import static java.nio.ByteOrder.LITTLE_ENDIAN;
+
 public class RORObjectEncoder extends MessageToByteEncoder<Frame> {
 
     @Override
@@ -28,9 +30,9 @@ public class RORObjectEncoder extends MessageToByteEncoder<Frame> {
 
         //System.out.println("ENCODING: " + frame.getClass().getSimpleName());
         try {
-            frame.writeData(buf); // frame data - dependent on frame
-        } catch(Exception e) {
-            System.out.println(e.toString());
+            frame.writeData(buf.order(LITTLE_ENDIAN)); // frame data - dependent on frame
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
         //System.out.println("SEND...");
     }

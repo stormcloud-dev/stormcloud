@@ -17,8 +17,6 @@ package io.github.stormcloud_dev.stormcloud.frame;
 
 import io.netty.buffer.ByteBuf;
 
-import java.nio.ByteOrder;
-
 public abstract class Frame {
 
     private byte id;
@@ -38,7 +36,7 @@ public abstract class Frame {
     }
 
     private void frameInformation(ByteBuf buf) {
-        buf.order(ByteOrder.LITTLE_ENDIAN).writeInt(getLength());
+        buf.writeInt(getLength());
         buf.writeByte(getId());
     }
 

@@ -16,9 +16,6 @@
 package io.github.stormcloud_dev.stormcloud.frame.clientbound;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-
-import static java.nio.ByteOrder.LITTLE_ENDIAN;
 
 public class SetPlayerClientBoundFrame extends ClientBoundFrame {
 
@@ -53,17 +50,16 @@ public class SetPlayerClientBoundFrame extends ClientBoundFrame {
     @Override
     public void writeData(ByteBuf buf) {
         super.writeData(buf);
-        ByteBuf leBuf = buf.order(LITTLE_ENDIAN);
-//        leBuf.writeDouble(getUnknown1());
-//        leBuf.writeDouble(getUnknown2());
+//        buf.writeDouble(getUnknown1());
+//        buf.writeDouble(getUnknown2());
 //        for (byte b : getVersion().getBytes()) {
 //            buf.writeByte(b);
 //        }
 //        buf.writeByte(0);
-        leBuf.writeDouble(15.0); //Object Index?
-        leBuf.writeDouble(0.0); //Multiplayer ID?
-        leBuf.writeDouble(3.0); //Don't know?
-        leBuf.writeDouble(40.0); //Don't know?
+        buf.writeDouble(15.0); //Object Index?
+        buf.writeDouble(0.0); //Multiplayer ID?
+        buf.writeDouble(3.0); //Don't know?
+        buf.writeDouble(40.0); //Don't know?
         for (byte b : getVersion().getBytes()) {
             buf.writeByte(b);
         }
