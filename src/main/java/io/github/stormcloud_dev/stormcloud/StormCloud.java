@@ -15,6 +15,7 @@
  */
 package io.github.stormcloud_dev.stormcloud;
 
+import io.github.stormcloud_dev.stormcloud.command.CommandManager;
 import io.github.stormcloud_dev.stormcloud.event.EventManager;
 import io.github.stormcloud_dev.stormcloud.seralization.RORObjectDecoder;
 import io.github.stormcloud_dev.stormcloud.seralization.RORObjectEncoder;
@@ -32,11 +33,13 @@ public class StormCloud {
     private int port;
     private Timer timer;
 
+    private CommandManager commandManager;
     private EventManager eventManager;
 
     public StormCloud(int port) {
         this.port = port;
         timer = new HashedWheelTimer();
+        commandManager = new CommandManager();
         eventManager = new EventManager();
     }
 
@@ -66,6 +69,10 @@ public class StormCloud {
 
     public Timer getTimer() {
         return timer;
+    }
+
+    public CommandManager getCommandManager() {
+        return commandManager;
     }
 
     public EventManager getEventManager() {

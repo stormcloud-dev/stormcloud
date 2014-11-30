@@ -15,12 +15,11 @@
  */
 package io.github.stormcloud_dev.stormcloud.event;
 
-import io.github.stormcloud_dev.stormcloud.util.ReflectionUtils;
-
 import java.lang.reflect.Method;
 import java.util.*;
 
 import static io.github.stormcloud_dev.stormcloud.event.EventHandlerPriority.*;
+import static io.github.stormcloud_dev.stormcloud.util.ReflectionUtils.isSubclassOf;
 import static java.lang.String.format;
 
 public class EventManager {
@@ -35,14 +34,14 @@ public class EventManager {
         for (Method method : listener.getClass().getMethods()) {
             if (method.isAnnotationPresent(EventHandler.class)) {
                 if (method.getParameterCount() == 1) {
-                    if (ReflectionUtils.isSubclassOf(method.getParameterTypes()[0], Event.class)) {
+                    if (isSubclassOf(method.getParameterTypes()[0], Event.class)) {
                         EventHandler eventHandler = method.getAnnotation(EventHandler.class);
                         Class<? extends Event> event = method.getParameterTypes()[0].asSubclass(Event.class);
-                        if (listeners.get(event) == null) {
+                        if (!listeners.containsKey(event)) {
                             listeners.put(event, new EnumMap<>(EventHandlerPriority.class));
                         }
                         EventHandlerPriority priority = eventHandler.priority();
-                        if (listeners.get(event).get(priority) == null) {
+                        if (!listeners.get(event).containsKey(priority)) {
                             listeners.get(event).put(priority, new ArrayList<>());
                         }
                         listeners.get(event).get(priority).add(new Listener(listener, method));

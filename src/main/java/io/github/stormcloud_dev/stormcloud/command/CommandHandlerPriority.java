@@ -13,14 +13,20 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package io.github.stormcloud_dev.stormcloud.util;
+package io.github.stormcloud_dev.stormcloud.command;
 
-public class ReflectionUtils {
+public enum CommandHandlerPriority {
 
-    private ReflectionUtils() {}
+    VERY_LOW(0), LOW(1), NORMAL(2), HIGH(3), VERY_HIGH(4);
 
-    public static boolean isSubclassOf(Class<?> clazz, Class<?> superClass) {
-        return clazz.getSuperclass() != null && (clazz == superClass || isSubclassOf(clazz.getSuperclass(), superClass));
+    private int value;
+
+    private CommandHandlerPriority(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
     }
 
 }
