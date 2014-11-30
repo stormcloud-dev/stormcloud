@@ -30,9 +30,10 @@ public class Player {
     private long xCooldown;
     private long cCooldown;
     private long vCooldown;
+    private long useItemCooldown;
     private long lastPing;
-    private double PosX;
-    private double PosY;
+    private double x;
+    private double y;
     private boolean ready;
 
     public Player(double MId, double objectIndex, String login) {
@@ -40,8 +41,8 @@ public class Player {
         this.objectIndex = objectIndex;
         this.name = "Player";
         this.login = login;
-        this.PosX = 0.0;
-        this.PosY = 0.0;
+        this.x = 0.0;
+        this.y = 0.0;
     }
 
     public double getMId() {
@@ -116,6 +117,14 @@ public class Player {
         vCooldown = currentTimeMillis() + millis;
     }
 
+    public long getUseItemCooldown() {
+        return max(useItemCooldown - currentTimeMillis(), 0);
+    }
+
+    public void setUseItemCooldown(long millis) {
+        useItemCooldown = currentTimeMillis() + millis;
+    }
+
     public long getPing() {
         return max(currentTimeMillis() - lastPing, 0);
     }
@@ -136,20 +145,20 @@ public class Player {
         this.ready = ready;
     }
 
-    public double getPosY() {
-        return PosY;
+    public double getY() {
+        return y;
     }
 
-    public void setPosY(double PosY) {
-        this.PosY = PosY;
+    public void setY(double PosY) {
+        this.y = PosY;
     }
 
-    public double getPosX() {
-        return PosX;
+    public double getX() {
+        return x;
     }
 
-    public void setPosX(double PosX) {
-        this.PosX = PosX;
+    public void setX(double PosX) {
+        this.x = PosX;
     }
 
 

@@ -46,11 +46,11 @@ public class PlayerListener {
         if (ingame) { //When we are ingame, players have to take the slots of left players (Can't add new players)
             server.getChannels().stream().filter(channel -> channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
                 channel.writeAndFlush(new CrewChoiceClientBoundFrame(0.0, 0.0, (short) 2));
-                channel.writeAndFlush(new TransportClientBoundFrame(0.0, 0.0, 23.0, event.getPlayer().getPosX(), event.getPlayer().getPosY(), 2440.0, 832.0, (byte) 0));
+                channel.writeAndFlush(new TransportClientBoundFrame(0.0, 0.0, 23.0, event.getPlayer().getX(), event.getPlayer().getY(), 2440.0, 832.0, (byte) 0));
                 //We have to update the positions of the other players if we join mid game
                 server.getChannels().stream().filter(playerChannel -> !playerChannel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(playerChannel -> {
                     Player player = playerChannel.attr(StormCloudHandler.PLAYER).get();
-                    channel.writeAndFlush(new PositionInfoClientBoundFrame(167.0, player.getMId(), player.getPosX(), player.getPosY(), (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0));
+                    channel.writeAndFlush(new PositionInfoClientBoundFrame(167.0, player.getMId(), player.getX(), player.getY(), (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0));
 
                 });
             });
@@ -132,41 +132,41 @@ public class PlayerListener {
                 if (spawnInfo.length == 7) {
                     server.getChannels().stream().forEach(channel -> {
                         Player player = channel.attr(StormCloudHandler.PLAYER).get();
-                        channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, 0.0, Short.valueOf(spawnInfo[2]), event.getPlayer().getPosX(), event.getPlayer().getPosY(), (Short.valueOf(spawnInfo[3]) == 1 ? (byte) 1 : (byte) 0), Short.valueOf(spawnInfo[4]), Short.valueOf(spawnInfo[5]), Short.valueOf(spawnInfo[6])));
+                        channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, 0.0, Short.valueOf(spawnInfo[2]), event.getPlayer().getX(), event.getPlayer().getY(), (Short.valueOf(spawnInfo[3]) == 1 ? (byte) 1 : (byte) 0), Short.valueOf(spawnInfo[4]), Short.valueOf(spawnInfo[5]), Short.valueOf(spawnInfo[6])));
                     });
                 }
                 break;
             case "!w":
                 //TODO: Remove, just for debugging the possible monster cards for the map
-                Double posX = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
+                Double posX = event.getPlayer().getX() - ((Math.random() * 300) - 150);
                 Double newEnemyMId = server.getEnemyList().size() + 100.0;
-                server.getEnemyList().put(newEnemyMId, new Enemy(newEnemyMId, 0.0, posX, (event.getPlayer().getPosY() - 300)));
+                server.getEnemyList().put(newEnemyMId, new Enemy(newEnemyMId, 0.0, posX, (event.getPlayer().getY() - 300)));
                 server.getChannels().stream().forEach(channel -> { //Card 0
-                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId, (short) 0, posX, (event.getPlayer().getPosY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
+                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId, (short) 0, posX, (event.getPlayer().getY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
                 });
-                Double posX1 = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
+                Double posX1 = event.getPlayer().getX() - ((Math.random() * 300) - 150);
                 Double newEnemyMId1 = server.getEnemyList().size() + 100.0;
-                server.getEnemyList().put(newEnemyMId1, new Enemy(newEnemyMId1, 0.0, posX, (event.getPlayer().getPosY() - 300)));
+                server.getEnemyList().put(newEnemyMId1, new Enemy(newEnemyMId1, 0.0, posX, (event.getPlayer().getY() - 300)));
                 server.getChannels().stream().forEach(channel -> { //Card 1
-                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId1, (short) 1, posX1, (event.getPlayer().getPosY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
+                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId1, (short) 1, posX1, (event.getPlayer().getY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
                 });
-                Double posX2 = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
+                Double posX2 = event.getPlayer().getX() - ((Math.random() * 300) - 150);
                 Double newEnemyMId2 = server.getEnemyList().size() + 100.0;
-                server.getEnemyList().put(newEnemyMId2, new Enemy(newEnemyMId2, 0.0, posX, (event.getPlayer().getPosY() - 300)));
+                server.getEnemyList().put(newEnemyMId2, new Enemy(newEnemyMId2, 0.0, posX, (event.getPlayer().getY() - 300)));
                 server.getChannels().stream().forEach(channel -> { //Card 3
-                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId2, (short) 3, posX2, (event.getPlayer().getPosY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
+                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId2, (short) 3, posX2, (event.getPlayer().getY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
                 });
-                Double posX3 = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
+                Double posX3 = event.getPlayer().getX() - ((Math.random() * 300) - 150);
                 Double newEnemyMId3 = server.getEnemyList().size() + 100.0;
-                server.getEnemyList().put(newEnemyMId3, new Enemy(newEnemyMId3, 0.0, posX, (event.getPlayer().getPosY() - 300)));
+                server.getEnemyList().put(newEnemyMId3, new Enemy(newEnemyMId3, 0.0, posX, (event.getPlayer().getY() - 300)));
                 server.getChannels().stream().forEach(channel -> { //Card 4
-                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId3, (short) 4, posX3, (event.getPlayer().getPosY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
+                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId3, (short) 4, posX3, (event.getPlayer().getY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
                 });
-                Double posX4 = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
+                Double posX4 = event.getPlayer().getX() - ((Math.random() * 300) - 150);
                 Double newEnemyMId4 = server.getEnemyList().size() + 100.0;
-                server.getEnemyList().put(newEnemyMId4, new Enemy(newEnemyMId4, 0.0, posX, (event.getPlayer().getPosY() - 300)));
+                server.getEnemyList().put(newEnemyMId4, new Enemy(newEnemyMId4, 0.0, posX, (event.getPlayer().getY() - 300)));
                 server.getChannels().stream().forEach(channel -> { //Card 5
-                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId4, (short) 5, posX4, (event.getPlayer().getPosY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
+                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId4, (short) 5, posX4, (event.getPlayer().getY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
                 });
                 break;
             default:
@@ -188,8 +188,8 @@ public class PlayerListener {
     @EventHandler
     public void onPlayerPosition(PlayerPositionEvent event) {
         //System.out.println(event.getPlayer().getName() + " moves to " + event.getFrame().getX() + "/" + event.getFrame().getY());
-        event.getPlayer().setPosX(event.getFrame().getX());
-        event.getPlayer().setPosY(event.getFrame().getY());
+        event.getPlayer().setX(event.getFrame().getX());
+        event.getPlayer().setY(event.getFrame().getY());
         server.getChannels().stream().filter(channel -> !channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
             //Object Index of 167 required (seems to be the index for position updates)
             channel.writeAndFlush(new PositionInfoClientBoundFrame(167.0, event.getPlayer().getMId(), event.getFrame().getX(), event.getFrame().getY(), event.getFrame().getLeft(), event.getFrame().getRight(), event.getFrame().getJump(), event.getFrame().getJumpHeld(), event.getFrame().getUp(), event.getFrame().getDown()));
@@ -213,8 +213,8 @@ public class PlayerListener {
                 if (server.getDisconnectedPlayers().containsKey(event.getPlayer().getLogin())) { //If there was a player on that slot he has to get the same clazz etc.
                     //event.getPlayer().setMId(oldPlayerList.get(event.getPlayer().getLogin()).getClazz());
                     event.getPlayer().setClazz(server.getDisconnectedPlayers().get(event.getPlayer().getLogin()).getClazz());
-                    event.getPlayer().setPosX(server.getDisconnectedPlayers().get(event.getPlayer().getLogin()).getPosX());
-                    event.getPlayer().setPosY(server.getDisconnectedPlayers().get(event.getPlayer().getLogin()).getPosY());
+                    event.getPlayer().setX(server.getDisconnectedPlayers().get(event.getPlayer().getLogin()).getX());
+                    event.getPlayer().setY(server.getDisconnectedPlayers().get(event.getPlayer().getLogin()).getY());
                     server.getDisconnectedPlayers().remove(event.getPlayer().getLogin());
                 }
                 //Only to the new player
@@ -222,27 +222,27 @@ public class PlayerListener {
                     //We have to update the positions of the other players if we join mid game
                     server.getPlayers().entrySet().stream().filter(entry -> !entry.getValue().equals(event.getPlayer())).forEach(entry -> {
                         Player player = entry.getValue();
-                        channel.writeAndFlush(new UpdatePlayerClientBoundFrame(210.0, player.getMId(), player.getClazz(), player.getPosX(), player.getPosY(), player.getName() + "|"));
+                        channel.writeAndFlush(new UpdatePlayerClientBoundFrame(210.0, player.getMId(), player.getClazz(), player.getX(), player.getY(), player.getName() + "|"));
                     });
                     //We have to setup the disconnected players too (If more than one player disconnects)
                     server.getDisconnectedPlayers().entrySet().stream().filter(entry -> !entry.getValue().equals(event.getPlayer())).forEach(entry -> {
                         Player player = entry.getValue();
-                        channel.writeAndFlush(new UpdatePlayerClientBoundFrame(210.0, player.getMId(), player.getClazz(), player.getPosX(), player.getPosY(), player.getName() + "|"));
+                        channel.writeAndFlush(new UpdatePlayerClientBoundFrame(210.0, player.getMId(), player.getClazz(), player.getX(), player.getY(), player.getName() + "|"));
                     });
                     //Setup the old character status and go ingame
-                    channel.writeAndFlush(new UpdatePlayerClientBoundFrame(210.0, event.getPlayer().getMId(), event.getPlayer().getClazz(), event.getPlayer().getPosX(), event.getPlayer().getPosY(), event.getPlayer().getName() + "|"));
+                    channel.writeAndFlush(new UpdatePlayerClientBoundFrame(210.0, event.getPlayer().getMId(), event.getPlayer().getClazz(), event.getPlayer().getX(), event.getPlayer().getY(), event.getPlayer().getName() + "|"));
                     channel.writeAndFlush(new CrewChoiceClientBoundFrame(0.0, 0.0, (short) 2));
-                    channel.writeAndFlush(new TransportClientBoundFrame(0.0, 0.0, 23.0, event.getPlayer().getPosX(), event.getPlayer().getPosY(), 2440.0, 832.0, (byte) 0));
+                    channel.writeAndFlush(new TransportClientBoundFrame(0.0, 0.0, 23.0, event.getPlayer().getX(), event.getPlayer().getY(), 2440.0, 832.0, (byte) 0));
                     //We have to update the positions of the other players if we join mid game
                     server.getPlayers().entrySet().stream().filter(entry -> !entry.getValue().equals(event.getPlayer())).forEach(entry -> {
                         Player player = entry.getValue();
-                        channel.writeAndFlush(new PositionInfoClientBoundFrame(167.0, player.getMId(), player.getPosX(), player.getPosY(), (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0));
+                        channel.writeAndFlush(new PositionInfoClientBoundFrame(167.0, player.getMId(), player.getX(), player.getY(), (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0));
 
                     });
                     //We also update the positions of the other disconnected players
                     server.getDisconnectedPlayers().entrySet().stream().filter(entry -> !entry.getValue().equals(event.getPlayer())).forEach(entry -> {
                         Player player = entry.getValue();
-                        channel.writeAndFlush(new PositionInfoClientBoundFrame(167.0, player.getMId(), player.getPosX(), player.getPosY(), (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0));
+                        channel.writeAndFlush(new PositionInfoClientBoundFrame(167.0, player.getMId(), player.getX(), player.getY(), (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0));
                     });
                 });
                 return; // We won't remove the character selection if it was already set
