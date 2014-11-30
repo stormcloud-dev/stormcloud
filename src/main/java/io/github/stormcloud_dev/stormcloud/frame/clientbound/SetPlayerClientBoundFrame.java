@@ -19,14 +19,14 @@ import io.netty.buffer.ByteBuf;
 
 public class SetPlayerClientBoundFrame extends ClientBoundFrame {
 
-    private double unknown1;
-    private double unknown2;
+    private double playerId;
+    private double roomId;
     private String version;
 
-    public SetPlayerClientBoundFrame(double objectIndex, double multiplayerId, double unknown1, double unknown2, String version) {
+    public SetPlayerClientBoundFrame(double objectIndex, double multiplayerId, double playerId, double roomId, String version) {
         super((byte) 2, objectIndex, multiplayerId);
-        this.unknown1 = unknown1;
-        this.unknown2 = unknown2;
+        this.playerId = playerId;
+        this.roomId = roomId;
         this.version = version;
     }
 
@@ -35,12 +35,12 @@ public class SetPlayerClientBoundFrame extends ClientBoundFrame {
         return 40;
     }
 
-    public double getUnknown1() {
-        return unknown1;
+    public double getPlayerId() {
+        return playerId;
     }
 
-    public double getUnknown2() {
-        return unknown2;
+    public double getRoomId() {
+        return roomId;
     }
 
     public String getVersion() {
@@ -50,14 +50,9 @@ public class SetPlayerClientBoundFrame extends ClientBoundFrame {
     @Override
     public void writeData(ByteBuf buf) {
         super.writeData(buf);
-//        buf.writeDouble(getUnknown1());
-//        buf.writeDouble(getUnknown2());
-//        for (byte b : getVersion().getBytes()) {
-//            buf.writeByte(b);
-//        }
-//        buf.writeByte(0);
-        buf.writeDouble(3.0); //Don't know?
-        buf.writeDouble(40.0); //Don't know?
+
+        buf.writeDouble(getPlayerId());
+        buf.writeDouble(getRoomId());
         for (byte b : getVersion().getBytes()) {
             buf.writeByte(b);
         }

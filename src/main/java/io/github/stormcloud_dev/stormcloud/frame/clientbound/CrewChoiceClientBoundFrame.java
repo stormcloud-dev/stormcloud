@@ -17,7 +17,6 @@ package io.github.stormcloud_dev.stormcloud.frame.clientbound;
 
 import io.github.stormcloud_dev.stormcloud.CrewMember;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
 
 public class CrewChoiceClientBoundFrame extends ClientBoundFrame {
 
@@ -35,7 +34,7 @@ public class CrewChoiceClientBoundFrame extends ClientBoundFrame {
 
     @Override
     public int getLength() {
-        return 21;
+        return 19;
     }
 
     public short getCrewMember() {

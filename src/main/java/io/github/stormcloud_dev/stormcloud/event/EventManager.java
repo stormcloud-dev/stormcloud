@@ -61,11 +61,11 @@ public class EventManager {
             Class<? extends Event> eventType = event.getClass();
             if (!listeners.containsKey(eventType)) return;
             synchronized (listeners.get(eventType)) {
-                listeners.get(eventType).get(VERY_LOW).stream().forEach(listener -> listener.onEvent(event));
-                listeners.get(eventType).get(LOW).stream().forEach(listener -> listener.onEvent(event));
-                listeners.get(eventType).get(NORMAL).stream().forEach(listener -> listener.onEvent(event));
-                listeners.get(eventType).get(HIGH).stream().forEach(listener -> listener.onEvent(event));
-                listeners.get(eventType).get(VERY_HIGH).stream().forEach(listener -> listener.onEvent(event));
+                if (listeners.get(eventType).get(VERY_LOW) != null) listeners.get(eventType).get(VERY_LOW).stream().forEach(listener -> listener.onEvent(event));
+                if (listeners.get(eventType).get(LOW) != null) listeners.get(eventType).get(LOW).stream().forEach(listener -> listener.onEvent(event));
+                if (listeners.get(eventType).get(NORMAL) != null) listeners.get(eventType).get(NORMAL).stream().forEach(listener -> listener.onEvent(event));
+                if (listeners.get(eventType).get(HIGH) != null) listeners.get(eventType).get(HIGH).stream().forEach(listener -> listener.onEvent(event));
+                if (listeners.get(eventType).get(VERY_HIGH) != null) listeners.get(eventType).get(VERY_HIGH).stream().forEach(listener -> listener.onEvent(event));
             }
         }
     }

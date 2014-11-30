@@ -31,18 +31,25 @@ public class Player {
     private long cCooldown;
     private long vCooldown;
     private long lastPing;
+    private double PosX;
+    private double PosY;
     private boolean ready;
 
-    public Player(double MId, double objectIndex) {
+    public Player(double MId, double objectIndex, String login) {
         this.MId = MId;
         this.objectIndex = objectIndex;
-        this.clazz = CrewMember.COMMANDO;
         this.name = "Player";
-        this.login = "";
+        this.login = login;
+        this.PosX = 0.0;
+        this.PosY = 0.0;
     }
 
     public double getMId() {
         return MId;
+    }
+
+    public void setMId(double MId) {
+        this.MId = MId;
     }
 
     public double getObjectIndex() {
@@ -65,12 +72,16 @@ public class Player {
         this.login = login;
     }
 
-    public CrewMember getClazz() {
-        return clazz;
+    public int getClazz() { //We have to return an int to match the frame (and we can return -1)
+        return (clazz != null?clazz.getId():-1);
     }
 
     public void setClazz(CrewMember clazz) {
         this.clazz = clazz;
+    }
+
+    public void setClazz(int clazz) {
+        this.clazz = (clazz != -1?CrewMember.values()[clazz]:null);
     }
 
     public long getZCooldown() {
@@ -124,5 +135,22 @@ public class Player {
     public void setReady(boolean ready) {
         this.ready = ready;
     }
+
+    public double getPosY() {
+        return PosY;
+    }
+
+    public void setPosY(double PosY) {
+        this.PosY = PosY;
+    }
+
+    public double getPosX() {
+        return PosX;
+    }
+
+    public void setPosX(double PosX) {
+        this.PosX = PosX;
+    }
+
 
 }

@@ -29,6 +29,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public class StormCloud {
 
     private int port;
@@ -39,6 +41,17 @@ public class StormCloud {
     public ChannelGroup getChannels() {
         return handler.getChannels();
     }
+
+    public ConcurrentHashMap<Double, Player> getPlayers() {
+        return handler.getPlayers();
+    }
+    public ConcurrentHashMap<String, Player> getDisconnectedPlayers() {
+        return handler.getDisconnectedPlayers();
+    }
+    public ConcurrentHashMap<Double, Enemy> getEnemyList() {
+        return handler.getEnemyList();
+    }
+
     private CommandManager commandManager;
     private EventManager eventManager;
 

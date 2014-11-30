@@ -17,26 +17,26 @@ package io.github.stormcloud_dev.stormcloud.event.player;
 
 import io.github.stormcloud_dev.stormcloud.Player;
 import io.github.stormcloud_dev.stormcloud.event.Event;
-import io.github.stormcloud_dev.stormcloud.frame.serverbound.SetReadyServerBoundFrame;
+import io.github.stormcloud_dev.stormcloud.frame.serverbound.ChatPlayerServerBoundFrame;
 
-public class PlayerReadyChangeEvent extends Event {
+public class PlayerChatEvent extends Event {
     private Player player;
-    private SetReadyServerBoundFrame frame;
+    private ChatPlayerServerBoundFrame frame;
 
-    public PlayerReadyChangeEvent(Player player, SetReadyServerBoundFrame frame) {
+    public PlayerChatEvent(Player player, ChatPlayerServerBoundFrame frame) {
         this.player = player;
         this.frame = frame;
     }
 
-    public boolean isReady() {
-        return frame.getReady() == 1;
+    public Player getPlayer() {
+        return player;
     }
 
-    public SetReadyServerBoundFrame getFrame() {
+    public ChatPlayerServerBoundFrame getFrame() {
         return frame;
     }
 
-    public Player getPlayer() {
-        return player;
+    public String getMessage() {
+        return frame.getText();
     }
 }

@@ -63,17 +63,20 @@ public class RORObjectDecoder extends ByteToMessageDecoder {
             }
         }
 
-        /* Print packets for debugging
-        int readerIndex = buf.readerIndex(), writerIndex = buf.writerIndex();
-        byte[] bytes = new byte[buf.readableBytes()];
-        buf.readBytes(buf.readableBytes()).readBytes(bytes);
-        buf.setIndex(readerIndex, writerIndex);
-        System.out.println(Arrays.toString(bytes)); */
 
 
         int length = buf.readByte();
         buf.readBytes(3);
         byte id = buf.readByte();
+
+        if(id != 16) {
+        /* Print packets for debugging */
+            int readerIndex = buf.readerIndex(), writerIndex = buf.writerIndex();
+            byte[] bytes = new byte[buf.readableBytes()];
+            buf.readBytes(buf.readableBytes()).readBytes(bytes);
+            buf.setIndex(readerIndex, writerIndex);
+            System.out.println("ID: " + id + " - " + Arrays.toString(bytes));
+        }
 
         switch (id) {
             case 0:

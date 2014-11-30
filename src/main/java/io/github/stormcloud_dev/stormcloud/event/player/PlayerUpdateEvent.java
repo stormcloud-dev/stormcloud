@@ -13,32 +13,27 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package io.github.stormcloud_dev.stormcloud.frame.clientbound;
+package io.github.stormcloud_dev.stormcloud.event.player;
 
-import io.netty.buffer.ByteBuf;
+import io.github.stormcloud_dev.stormcloud.Player;
+import io.github.stormcloud_dev.stormcloud.event.Event;
+import io.github.stormcloud_dev.stormcloud.frame.serverbound.UpdatePlayerServerBoundFrame;
 
-public class StartGameClientBoundFrame extends ClientBoundFrame {
+public class PlayerUpdateEvent extends Event {
+    private Player player;
 
-    private int difficulty;
+    private UpdatePlayerServerBoundFrame frame;
 
-    public StartGameClientBoundFrame(double objectIndex, double multiplayerId, int difficulty) {
-        super((byte) 45, objectIndex, multiplayerId);
-        this.difficulty = difficulty;
+    public PlayerUpdateEvent(Player player, UpdatePlayerServerBoundFrame frame) {
+        this.player = player;
+        this.frame = frame;
     }
 
-    @Override
-    public int getLength() {
-        return 19;
+    public Player getPlayer() {
+        return player;
     }
 
-    public int getDifficulty() {
-        return difficulty;
+    public UpdatePlayerServerBoundFrame getFrame() {
+        return frame;
     }
-
-    @Override
-    public void writeData(ByteBuf buf) {
-        super.writeData(buf);
-        buf.writeChar(getDifficulty());
-    }
-
 }

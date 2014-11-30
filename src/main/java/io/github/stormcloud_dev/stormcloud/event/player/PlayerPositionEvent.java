@@ -17,26 +17,23 @@ package io.github.stormcloud_dev.stormcloud.event.player;
 
 import io.github.stormcloud_dev.stormcloud.Player;
 import io.github.stormcloud_dev.stormcloud.event.Event;
-import io.github.stormcloud_dev.stormcloud.frame.serverbound.SetReadyServerBoundFrame;
+import io.github.stormcloud_dev.stormcloud.frame.serverbound.PositionInfoServerBoundFrame;
 
-public class PlayerReadyChangeEvent extends Event {
+public class PlayerPositionEvent extends Event {
     private Player player;
-    private SetReadyServerBoundFrame frame;
 
-    public PlayerReadyChangeEvent(Player player, SetReadyServerBoundFrame frame) {
+    private PositionInfoServerBoundFrame frame;
+
+    public PlayerPositionEvent(Player player, PositionInfoServerBoundFrame frame) {
         this.player = player;
         this.frame = frame;
     }
 
-    public boolean isReady() {
-        return frame.getReady() == 1;
-    }
-
-    public SetReadyServerBoundFrame getFrame() {
-        return frame;
-    }
-
     public Player getPlayer() {
         return player;
+    }
+
+    public PositionInfoServerBoundFrame getFrame() {
+        return frame;
     }
 }
