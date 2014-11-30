@@ -17,6 +17,7 @@ package io.github.stormcloud_dev.stormcloud.event;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static io.github.stormcloud_dev.stormcloud.event.EventHandlerPriority.*;
 import static io.github.stormcloud_dev.stormcloud.util.ReflectionUtils.isSubclassOf;
@@ -24,10 +25,10 @@ import static java.lang.String.format;
 
 public class EventManager {
 
-    private Map<Class<? extends Event>, Map<EventHandlerPriority, List<Listener>>> listeners;
+    private final Map<Class<? extends Event>, Map<EventHandlerPriority, List<Listener>>> listeners;
 
     public EventManager() {
-        listeners = new HashMap<>();
+        listeners = new ConcurrentHashMap<>();
     }
 
     public void addListener(Object listener) throws InvalidEventHandlerException {
@@ -38,11 +39,11 @@ public class EventManager {
                         EventHandler eventHandler = method.getAnnotation(EventHandler.class);
                         Class<? extends Event> event = method.getParameterTypes()[0].asSubclass(Event.class);
                         if (!listeners.containsKey(event)) {
-                            listeners.put(event, new EnumMap<>(EventHandlerPriority.class));
+                            listeners.put(event, Collections.synchronizedMap(new EnumMap<>(EventHandlerPriority.class)));
                         }
                         EventHandlerPriority priority = eventHandler.priority();
                         if (!listeners.get(event).containsKey(priority)) {
-                            listeners.get(event).put(priority, new ArrayList<>());
+                            listeners.get(event).put(priority, Collections.synchronizedList(new ArrayList<>()));
                         }
                         listeners.get(event).get(priority).add(new Listener(listener, method));
                     } else {
@@ -56,13 +57,17 @@ public class EventManager {
     }
 
     public void onEvent(Event event) {
-        Class<? extends Event> eventType = event.getClass();
-        if (listeners.get(eventType) == null) return;
-        listeners.get(eventType).get(VERY_LOW).stream().forEach(listener -> listener.onEvent(event));
-        listeners.get(eventType).get(LOW).stream().forEach(listener -> listener.onEvent(event));
-        listeners.get(eventType).get(NORMAL).stream().forEach(listener -> listener.onEvent(event));
-        listeners.get(eventType).get(HIGH).stream().forEach(listener -> listener.onEvent(event));
-        listeners.get(eventType).get(VERY_HIGH).stream().forEach(listener -> listener.onEvent(event));
+        synchronized (listeners) {
+            Class<? extends Event> eventType = event.getClass();
+            if (!listeners.containsKey(eventType)) return;
+            synchronized (listeners.get(eventType)) {
+                listeners.get(eventType).get(VERY_LOW).stream().forEach(listener -> listener.onEvent(event));
+                listeners.get(eventType).get(LOW).stream().forEach(listener -> listener.onEvent(event));
+                listeners.get(eventType).get(NORMAL).stream().forEach(listener -> listener.onEvent(event));
+                listeners.get(eventType).get(HIGH).stream().forEach(listener -> listener.onEvent(event));
+                listeners.get(eventType).get(VERY_HIGH).stream().forEach(listener -> listener.onEvent(event));
+            }
+        }
     }
 
 }

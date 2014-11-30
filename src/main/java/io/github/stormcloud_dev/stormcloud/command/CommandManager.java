@@ -16,9 +16,9 @@
 package io.github.stormcloud_dev.stormcloud.command;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static io.github.stormcloud_dev.stormcloud.util.ReflectionUtils.isSubclassOf;
 import static java.lang.String.format;
@@ -28,7 +28,7 @@ public class CommandManager {
     private Map<String, Command> commands;
 
     public CommandManager() {
-        commands = new HashMap<>();
+        commands = new ConcurrentHashMap<>();
     }
 
     public void addCommand(Object executor) throws InvalidCommandHandlerException, CommandConflictException {
