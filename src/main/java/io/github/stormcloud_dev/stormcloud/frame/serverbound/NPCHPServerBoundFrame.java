@@ -67,8 +67,8 @@ public class NPCHPServerBoundFrame extends ServerBoundFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
-        super.writeData(buf, ctx);
+    public void writeData(ByteBuf buf) {
+        super.writeData(buf);
         buf.writeDouble(getHp());
         buf.writeDouble(getX());
         buf.writeDouble(getY());

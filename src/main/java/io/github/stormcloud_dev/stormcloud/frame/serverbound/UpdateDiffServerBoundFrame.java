@@ -103,8 +103,8 @@ public class UpdateDiffServerBoundFrame extends ServerBoundFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
-        super.writeData(buf, ctx);
+    public void writeData(ByteBuf buf) {
+        super.writeData(buf);
         //buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(0.0); //Unknown Double
         //buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(0.0); //Uknown Double
         buf.writeByte(getDiffLevel());

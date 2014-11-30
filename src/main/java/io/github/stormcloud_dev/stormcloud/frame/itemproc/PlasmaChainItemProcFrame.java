@@ -55,8 +55,8 @@ public class PlasmaChainItemProcFrame extends ItemProcFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
-        super.writeData(buf, ctx);
+    public void writeData(ByteBuf buf) {
+        super.writeData(buf);
         buf.writeShort(getMId());
         buf.writeDouble(getObjectIndex());
         buf.writeShort(getTargetMId());

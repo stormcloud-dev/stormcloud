@@ -17,7 +17,6 @@ package io.github.stormcloud_dev.stormcloud.frame.serverbound;
 
 import io.github.stormcloud_dev.stormcloud.frame.Frame;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
 
 public abstract class ServerBoundFrame extends Frame {
 
@@ -26,8 +25,8 @@ public abstract class ServerBoundFrame extends Frame {
     }
 
     @Override
-    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
-        super.writeData(buf, ctx);
+    public void writeData(ByteBuf buf) {
+        super.writeData(buf);
     }
 
 }

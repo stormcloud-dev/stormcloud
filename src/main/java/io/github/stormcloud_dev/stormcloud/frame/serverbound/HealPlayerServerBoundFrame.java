@@ -55,8 +55,8 @@ public class HealPlayerServerBoundFrame extends ServerBoundFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
-        super.writeData(buf, ctx);
+    public void writeData(ByteBuf buf) {
+        super.writeData(buf);
         buf.writeDouble(getUnknown1());
         buf.writeDouble(getUnknown2());
         buf.writeDouble(getUnknown3());

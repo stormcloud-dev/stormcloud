@@ -16,10 +16,10 @@
 package io.github.stormcloud_dev.stormcloud;
 
 import io.github.stormcloud_dev.stormcloud.frame.HandshakeFrame;
+import io.github.stormcloud_dev.stormcloud.frame.clientbound.SetPlayerClientBoundFrame;
+import io.github.stormcloud_dev.stormcloud.frame.clientbound.TestClientBoundFrame;
+import io.github.stormcloud_dev.stormcloud.frame.clientbound.UpdateDiffClientBoundFrame;
 import io.github.stormcloud_dev.stormcloud.frame.serverbound.AddPlayerServerBoundFrame;
-import io.github.stormcloud_dev.stormcloud.frame.serverbound.SetPlayerServerBoundFrame;
-import io.github.stormcloud_dev.stormcloud.frame.serverbound.TestServerBoundFrame;
-import io.github.stormcloud_dev.stormcloud.frame.serverbound.UpdateDiffServerBoundFrame;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerAdapter;
@@ -32,6 +32,7 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import java.util.Random;
 
 import static io.netty.channel.ChannelHandler.Sharable;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Sharable
 public class StormCloudHandler extends ChannelHandlerAdapter {
@@ -41,31 +42,27 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
 
     private ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
+    private StormCloud server;
+
+    public StormCloudHandler(StormCloud server) {
+        this.server = server;
+    }
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("Channel active");
         Random random = new Random();
         ctx.channel().attr(StormCloudHandler.PLAYER).set(new Player(random.nextInt(), random.nextInt()));
-
         channels.add(ctx.channel());
         ctx.writeAndFlush(Unpooled.wrappedBuffer("GM:Studio-Connect\u0000".getBytes("utf8")));
-
         //Thread that tests if the connection is alive (The client needs that, else it will disconnect)
-        Thread testThread = new Thread(new Runnable() {
+        Thread testThread = new Thread(() -> {
             Channel channel = ctx.channel();
-
-            public void run() {
-                while(channel.isActive()) {
-                    try {
-                        Thread.sleep(1000);
-                        channel.writeAndFlush(new TestServerBoundFrame());
-                    } catch(Exception e) {
-
-                    }
-                }
-            }
+            server.getTimer().newTimeout(timeout -> {
+                Player player = ctx.channel().attr(StormCloudHandler.PLAYER).get();
+                if (channel.isActive()) channel.writeAndFlush(new TestClientBoundFrame(player.getObjectIndex(), player.getMId()));
+            }, 1, SECONDS);
         });
-
         testThread.start();
     }
 
@@ -76,26 +73,20 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-
         if (msg instanceof HandshakeFrame) {
+            Player sender = ctx.channel().attr(PLAYER).get();
             ctx.writeAndFlush(Unpooled.wrappedBuffer(new byte[]{-83, -66, -81, -34, -21, -66, 13, -16, 12, 0, 0, 0}));
-            ctx.writeAndFlush(new SetPlayerServerBoundFrame(0.0, 0.0, "v1.2.4"));
-            ctx.writeAndFlush(new UpdateDiffServerBoundFrame((byte) 2, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0));
+            ctx.writeAndFlush(new SetPlayerClientBoundFrame(sender.getObjectIndex(), sender.getMId(), 0.0, 0.0, "v1.2.4"));
+            ctx.writeAndFlush(new UpdateDiffClientBoundFrame(sender.getObjectIndex(), sender.getMId(), (byte) 2, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0));
             //ctx.writeAndFlush(new AddPlayerServerBoundFrame(0.0, 0.0, 0.0, -1, 1, "HOST|"));
-
-            for (Channel channel : channels) {
-                if(!channel.equals(ctx.channel())) {
-                    Player player = ctx.channel().attr(StormCloudHandler.PLAYER).get();
-                    channel.writeAndFlush(new AddPlayerServerBoundFrame(0.0, 0.0, player.getMId(), player.getClazz(), 1, player.getName()));
-                }
-            }
-
+            channels.stream().filter(channel -> !channel.equals(ctx.channel())).forEach(channel -> {
+                Player player = ctx.channel().attr(StormCloudHandler.PLAYER).get();
+                channel.writeAndFlush(new AddPlayerServerBoundFrame(0.0, 0.0, player.getMId(), player.getClazz(), 1, player.getName()));
+            });
         } else {
-            for (Channel channel : channels) {
-                if(!channel.equals(ctx.channel())) {
-                    channel.writeAndFlush(msg);
-                }
-            }
+            channels.stream().filter(channel -> !channel.equals(ctx.channel())).forEach(channel -> {
+                channel.writeAndFlush(msg);
+            });
         }
 //        if (msg instanceof ByteBuf) {
 //            ByteBuf buf = (ByteBuf) msg;

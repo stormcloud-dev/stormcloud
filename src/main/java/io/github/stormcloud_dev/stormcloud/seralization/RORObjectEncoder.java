@@ -28,7 +28,7 @@ public class RORObjectEncoder extends MessageToByteEncoder<Frame> {
 
         //System.out.println("ENCODING: " + frame.getClass().getSimpleName());
         try {
-            frame.writeData(buf, ctx); // frame data - dependent on frame
+            frame.writeData(buf); // frame data - dependent on frame
         } catch(Exception e) {
             System.out.println(e.toString());
         }

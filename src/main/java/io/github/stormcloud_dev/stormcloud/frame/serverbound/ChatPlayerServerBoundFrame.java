@@ -37,8 +37,8 @@ public class ChatPlayerServerBoundFrame extends ServerBoundFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
-        super.writeData(buf, ctx);
+    public void writeData(ByteBuf buf) {
+        super.writeData(buf);
 
         for (byte b : getText().getBytes()) {
             buf.writeByte(b);

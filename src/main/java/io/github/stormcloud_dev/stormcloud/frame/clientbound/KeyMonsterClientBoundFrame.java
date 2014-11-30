@@ -16,7 +16,6 @@
 package io.github.stormcloud_dev.stormcloud.frame.clientbound;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
 
 public class KeyMonsterClientBoundFrame extends ClientBoundFrame {
 
@@ -73,8 +72,8 @@ public class KeyMonsterClientBoundFrame extends ClientBoundFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
-        super.writeData(buf, ctx);
+    public void writeData(ByteBuf buf) {
+        super.writeData(buf);
         buf.writeDouble(getX());
         buf.writeDouble(getY());
         buf.writeByte(getZAction());

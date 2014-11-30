@@ -51,16 +51,9 @@ public class SetPlayerServerBoundFrame extends ServerBoundFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
+    public void writeData(ByteBuf buf) {
         super.writeData(buf); //For some reason the object index has to be 15, so we don't send the player info
-        buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(15.0); //Object Index?
-        buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(0.0); //Multiplayer ID?
-        buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(3.0); //Don't know?
-        buf.order(ByteOrder.LITTLE_ENDIAN).writeDouble(40.0); //Don't know?
-        for (byte b : getVersion().getBytes()) {
-            buf.writeByte(b);
-        }
-        buf.writeByte(0);
+
     }
 
 }

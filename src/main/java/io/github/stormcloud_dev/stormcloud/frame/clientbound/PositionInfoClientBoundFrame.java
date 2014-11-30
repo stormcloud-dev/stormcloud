@@ -79,8 +79,8 @@ public class PositionInfoClientBoundFrame extends ClientBoundFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
-        super.writeData(buf, ctx);
+    public void writeData(ByteBuf buf) {
+        super.writeData(buf);
         buf.writeDouble(getX());
         buf.writeDouble(getY());
         buf.writeByte(getLeft());

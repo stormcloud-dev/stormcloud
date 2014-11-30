@@ -23,21 +23,25 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.HashedWheelTimer;
+import io.netty.util.Timer;
 
 public class StormCloud {
 
     private int port;
+    private Timer timer;
 
     public StormCloud(int port) {
         this.port = port;
     }
 
     public void run() throws InterruptedException {
+        timer = new HashedWheelTimer();
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
-            StormCloudHandler handler = new StormCloudHandler();
+            StormCloudHandler handler = new StormCloudHandler(this);
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
@@ -56,9 +60,19 @@ public class StormCloud {
         }
     }
 
+    public Timer getTimer() {
+        return timer;
+    }
+
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("Listening on port: " + Integer.valueOf(args[0]));
-        new StormCloud(Integer.valueOf(args[0])).run();
+        int port = 11100;
+        if (args.length > 0) {
+            try {
+                port = Integer.parseInt(args[0]);
+            } catch (NumberFormatException ignored) {}
+        }
+        System.out.println("Listening on port: " + port);
+        new StormCloud(port).run();
     }
 
 }

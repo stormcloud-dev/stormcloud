@@ -43,8 +43,8 @@ public class CrewChoiceClientBoundFrame extends ClientBoundFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
-        super.writeData(buf, ctx);
+    public void writeData(ByteBuf buf) {
+        super.writeData(buf);
         buf.writeShort(getCrewMember());
     }
 

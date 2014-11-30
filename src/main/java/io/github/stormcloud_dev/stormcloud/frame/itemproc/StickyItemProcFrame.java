@@ -16,7 +16,6 @@
 package io.github.stormcloud_dev.stormcloud.frame.itemproc;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
 
 public class StickyItemProcFrame extends ItemProcFrame {
 
@@ -49,8 +48,8 @@ public class StickyItemProcFrame extends ItemProcFrame {
     }
 
     @Override
-    public void writeData(ByteBuf buf, ChannelHandlerContext ctx) {
-        super.writeData(buf, ctx);
+    public void writeData(ByteBuf buf) {
+        super.writeData(buf);
         buf.writeShort(getParentObjectId());
         buf.writeShort(getParentMId());
         buf.writeShort(getDamage());
