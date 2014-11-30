@@ -164,18 +164,18 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
                 server.getEventManager().onEvent(new PlayerChatEvent(sender, serverFrame));
             }
         } else if (msg instanceof UpdatePlayerServerBoundFrame) {
-            UpdatePlayerServerBoundFrame serverFrame = ((UpdatePlayerServerBoundFrame)msg);
+            UpdatePlayerServerBoundFrame serverFrame = (UpdatePlayerServerBoundFrame) msg;
             server.getEventManager().onEvent(new PlayerUpdateEvent(sender, serverFrame));
         } else if (msg instanceof LagPlayerServerBoundFrame) {
             server.getEventManager().onEvent(new PlayerLagEvent(sender));
         } else if (msg instanceof SetReadyServerBoundFrame) {
-            SetReadyServerBoundFrame serverFrame = ((SetReadyServerBoundFrame)msg);
+            SetReadyServerBoundFrame serverFrame = (SetReadyServerBoundFrame) msg;
             server.getEventManager().onEvent(new PlayerReadyChangeEvent(sender, serverFrame));
         } else if (msg instanceof PositionInfoServerBoundFrame) {
-            PositionInfoServerBoundFrame serverFrame = ((PositionInfoServerBoundFrame)msg);
+            PositionInfoServerBoundFrame serverFrame = (PositionInfoServerBoundFrame) msg;
             server.getEventManager().onEvent(new PlayerPositionEvent(sender, serverFrame));
         } else if (msg instanceof KeyPlayerServerBoundFrame) {
-            KeyPlayerServerBoundFrame serverFrame = ((KeyPlayerServerBoundFrame)msg);
+            KeyPlayerServerBoundFrame serverFrame = (KeyPlayerServerBoundFrame) msg;
             server.getEventManager().onEvent(new PlayerKeyEvent(sender, serverFrame));
         } else {
             System.out.println(msg.getClass().getSimpleName());
