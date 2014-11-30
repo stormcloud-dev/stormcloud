@@ -13,14 +13,22 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package io.github.stormcloud_dev.stormcloud.util;
+package io.github.stormcloud_dev.stormcloud.command;
 
-public class ReflectionUtils {
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-    private ReflectionUtils() {}
+import static io.github.stormcloud_dev.stormcloud.command.CommandHandlerPriority.NORMAL;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-    public static boolean isSubclassOf(Class<?> clazz, Class<?> superClass) {
-        return clazz.getSuperclass() != null && (clazz == superClass || isSubclassOf(clazz.getSuperclass(), superClass));
-    }
+@Retention(RUNTIME)
+@Target(METHOD)
+public @interface CommandHandler {
+
+    String name();
+    CommandHandlerPriority priority() default NORMAL;
+    String[] aliases() default {};
+    String description() default "";
 
 }
