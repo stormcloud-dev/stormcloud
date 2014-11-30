@@ -154,8 +154,15 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
             //We tell the player listener that there's a new player
             server.getEventManager().onEvent(new PlayerAddEvent(sender));
         } else if (msg instanceof ChatPlayerServerBoundFrame) {
-            ChatPlayerServerBoundFrame serverFrame = ((ChatPlayerServerBoundFrame)msg);
-            server.getEventManager().onEvent(new PlayerChatEvent(sender, serverFrame));
+            ChatPlayerServerBoundFrame serverFrame = (ChatPlayerServerBoundFrame) msg;
+            if (serverFrame.getText().startsWith("!")) {
+                String[] messageParts = serverFrame.getText().split("\\s+");
+                String[] args = new String[messageParts.length - 1];
+                System.arraycopy(messageParts, 1, args, 0, messageParts.length - 1);
+                server.getCommandManager().onCommand(sender, messageParts[0].substring(1), args);
+            } else {
+                server.getEventManager().onEvent(new PlayerChatEvent(sender, serverFrame));
+            }
         } else if (msg instanceof UpdatePlayerServerBoundFrame) {
             UpdatePlayerServerBoundFrame serverFrame = ((UpdatePlayerServerBoundFrame)msg);
             server.getEventManager().onEvent(new PlayerUpdateEvent(sender, serverFrame));

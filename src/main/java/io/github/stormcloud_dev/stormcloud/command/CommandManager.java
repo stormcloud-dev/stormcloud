@@ -15,12 +15,13 @@
  */
 package io.github.stormcloud_dev.stormcloud.command;
 
+import io.github.stormcloud_dev.stormcloud.Player;
+
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static io.github.stormcloud_dev.stormcloud.util.ReflectionUtils.isSubclassOf;
 import static java.lang.String.format;
 
 public class CommandManager {
@@ -35,7 +36,7 @@ public class CommandManager {
         for (Method method : executor.getClass().getMethods()) {
             if (method.isAnnotationPresent(CommandHandler.class)) {
                 if (method.getParameterCount() == 2) {
-                    if (isSubclassOf(method.getParameterTypes()[0], String.class) && isSubclassOf(method.getParameterTypes()[1], String[].class)) {
+                    if (method.getParameterTypes()[0] == Player.class && method.getParameterTypes()[1] == String[].class) {
                         CommandHandler commandHandler = method.getAnnotation(CommandHandler.class);
                         String commandName = commandHandler.name();
                         if (!commands.containsKey(commandName) || commands.get(commandName).getPriority().getValue() < commandHandler.priority().getValue()) {
@@ -60,7 +61,7 @@ public class CommandManager {
         }
     }
 
-    public boolean onCommand(String sender, String command, String[] args) {
+    public boolean onCommand(Player sender, String command, String[] args) {
         if (commands.containsKey(command)) {
             commands.get(command).onCommand(sender, args);
             return true;

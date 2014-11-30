@@ -15,6 +15,8 @@
  */
 package io.github.stormcloud_dev.stormcloud.command;
 
+import io.github.stormcloud_dev.stormcloud.Player;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -32,7 +34,7 @@ public class Command {
         this.description = description;
     }
 
-    public void onCommand(String sender, String[] args) {
+    public void onCommand(Player sender, String[] args) {
         try {
             commandHandler.invoke(executor, sender, args);
         } catch (IllegalAccessException | InvocationTargetException exception) {
