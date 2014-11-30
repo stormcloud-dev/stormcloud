@@ -77,7 +77,7 @@ public class RORObjectDecoder extends ByteToMessageDecoder {
 
         switch (id) {
             case 0:
-                if (length < 39) return null;
+                //if (length < 39) return null;
                 return new PositionInfoServerBoundFrame(buf.readDouble(), buf.readDouble(), buf.readByte(), buf.readByte(), buf.readByte(), buf.readByte(), buf.readByte(), buf.readByte());
             case 1:
                 return new SetReadyServerBoundFrame(buf.readByte());

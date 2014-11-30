@@ -15,12 +15,13 @@
  */
 package io.github.stormcloud_dev.stormcloud;
 
+import io.github.stormcloud_dev.stormcloud.event.InvalidEventHandlerException;
+import io.github.stormcloud_dev.stormcloud.event.player.PlayerAddEvent;
+import io.github.stormcloud_dev.stormcloud.event.player.PlayerListener;
+import io.github.stormcloud_dev.stormcloud.event.player.PlayerReadyChangeEvent;
 import io.github.stormcloud_dev.stormcloud.frame.HandshakeFrame;
 import io.github.stormcloud_dev.stormcloud.frame.clientbound.*;
-import io.github.stormcloud_dev.stormcloud.frame.serverbound.ChatPlayerServerBoundFrame;
-import io.github.stormcloud_dev.stormcloud.frame.serverbound.LagPlayerServerBoundFrame;
-import io.github.stormcloud_dev.stormcloud.frame.serverbound.SetReadyServerBoundFrame;
-import io.github.stormcloud_dev.stormcloud.frame.serverbound.UpdatePlayerServerBoundFrame;
+import io.github.stormcloud_dev.stormcloud.frame.serverbound.*;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerAdapter;
@@ -43,10 +44,19 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
 
     private ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
+    public ChannelGroup getChannels() {
+        return channels;
+    }
+
     private StormCloud server;
 
     public StormCloudHandler(StormCloud server) {
         this.server = server;
+        try {
+            this.server.getEventManager().addListener(new PlayerListener(server));
+        } catch(InvalidEventHandlerException e) {
+            e.printStackTrace();
+        }
     }
 
     public void scheduleTestPacket(Channel channel) {
@@ -88,6 +98,7 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
             ctx.writeAndFlush(new SetPlayerClientBoundFrame(15.0, 0.0, 0.0, 0.0, "v1.2.4"));
             ctx.writeAndFlush(new UpdateDiffClientBoundFrame(0.0, 0.0, (byte) 2, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0));
             //ctx.writeAndFlush(new AddPlayerServerBoundFrame(0.0, 0.0, 0.0, -1, 1, "HOST|"));
+            server.getEventManager().onEvent(new PlayerAddEvent(sender));
             channels.stream().filter(channel -> !channel.equals(ctx.channel())).forEach(channel -> {
                 Player currentPlayer = channel.attr(StormCloudHandler.PLAYER).get();
                 ctx.channel().writeAndFlush(new AddPlayerClientBoundFrame(currentPlayer.getObjectIndex(), currentPlayer.getMId(), 0.0, 0.0, currentPlayer.getMId(), currentPlayer.getClazz(), 0, currentPlayer.getName()));
@@ -107,9 +118,19 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
                 channel.writeAndFlush(new LagPlayerClientBoundFrame(sender.getObjectIndex(), sender.getMId(), ((LagPlayerServerBoundFrame)msg).getPlayerName()));
             });
         } else if(msg instanceof SetReadyServerBoundFrame) {
+            SetReadyServerBoundFrame serverFrame = ((SetReadyServerBoundFrame)msg);
+            server.getEventManager().onEvent(new PlayerReadyChangeEvent(sender, serverFrame.getReady() == 1));
             channels.stream().filter(channel -> !channel.equals(ctx.channel())).forEach(channel -> {
-                channel.writeAndFlush(new SetReadyClientBoundFrame(sender.getObjectIndex(), sender.getMId(), ((SetReadyServerBoundFrame)msg).getReady()));
+                channel.writeAndFlush(new SetReadyClientBoundFrame(sender.getObjectIndex(), sender.getMId(), serverFrame.getReady()));
             });
+        } else if(msg instanceof PositionInfoServerBoundFrame) {
+            PositionInfoServerBoundFrame serverFrame = ((PositionInfoServerBoundFrame)msg);
+
+            channels.stream().filter(channel -> !channel.equals(ctx.channel())).forEach(channel -> {
+                channel.writeAndFlush(new PositionInfoClientBoundFrame(167.0, sender.getMId(), serverFrame.getX(), serverFrame.getY(), serverFrame.getLeft(), serverFrame.getRight(), serverFrame.getJump(), serverFrame.getJumpHeld(), serverFrame.getUp(), serverFrame.getDown()));
+            });
+        } else {
+            System.out.println(msg.getClass().getSimpleName());
         }
             //channels.stream().filter(channel -> !channel.equals(ctx.channel())).forEach(channel -> {
                 //channel.writeAndFlush(msg);

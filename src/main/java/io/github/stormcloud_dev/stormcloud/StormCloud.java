@@ -21,6 +21,7 @@ import io.github.stormcloud_dev.stormcloud.seralization.RORObjectEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -32,6 +33,11 @@ public class StormCloud {
     private int port;
     private Timer timer;
 
+    private StormCloudHandler handler;
+
+    public ChannelGroup getChannels() {
+        return handler.getChannels();
+    }
     private EventManager eventManager;
 
     public StormCloud(int port) {
@@ -45,7 +51,7 @@ public class StormCloud {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
-            StormCloudHandler handler = new StormCloudHandler(this);
+            handler = new StormCloudHandler(this);
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
