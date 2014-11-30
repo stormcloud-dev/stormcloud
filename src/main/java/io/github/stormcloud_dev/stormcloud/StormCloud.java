@@ -15,6 +15,7 @@
  */
 package io.github.stormcloud_dev.stormcloud;
 
+import io.github.stormcloud_dev.stormcloud.event.EventManager;
 import io.github.stormcloud_dev.stormcloud.seralization.RORObjectDecoder;
 import io.github.stormcloud_dev.stormcloud.seralization.RORObjectEncoder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -31,12 +32,15 @@ public class StormCloud {
     private int port;
     private Timer timer;
 
+    private EventManager eventManager;
+
     public StormCloud(int port) {
         this.port = port;
+        timer = new HashedWheelTimer();
+        eventManager = new EventManager();
     }
 
     public void run() throws InterruptedException {
-        timer = new HashedWheelTimer();
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -62,6 +66,10 @@ public class StormCloud {
 
     public Timer getTimer() {
         return timer;
+    }
+
+    public EventManager getEventManager() {
+        return eventManager;
     }
 
     public static void main(String[] args) throws InterruptedException {
