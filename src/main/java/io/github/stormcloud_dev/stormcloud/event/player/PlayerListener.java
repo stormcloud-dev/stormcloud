@@ -20,7 +20,6 @@ import io.github.stormcloud_dev.stormcloud.event.EventHandler;
 import io.github.stormcloud_dev.stormcloud.frame.clientbound.*;
 
 import java.util.Map;
-import java.util.Random;
 
 public class PlayerListener {
 
@@ -44,7 +43,7 @@ public class PlayerListener {
             }
         }
 
-        if(ingame) { //When we are ingame, players have to take the slots of left players (Can't add new players)
+        if (ingame) { //When we are ingame, players have to take the slots of left players (Can't add new players)
             server.getChannels().stream().filter(channel -> channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
                 channel.writeAndFlush(new CrewChoiceClientBoundFrame(0.0, 0.0, (short) 2));
                 channel.writeAndFlush(new TransportClientBoundFrame(0.0, 0.0, 23.0, event.getPlayer().getPosX(), event.getPlayer().getPosY(), 2440.0, 832.0, (byte) 0));
@@ -57,9 +56,9 @@ public class PlayerListener {
             });
         } else if (allReady) { //If all players are ready, we send the frames to start the game
             System.out.println("All players are ready... game starting!");
-            Random random = new Random();
+            //Random random = new Random();
             server.getChannels().stream().forEach(channel -> {
-                Player player = channel.attr(StormCloudHandler.PLAYER).get();
+                //Player player = channel.attr(StormCloudHandler.PLAYER).get();
                 //TODO: Level generation
                 channel.writeAndFlush(new CrewChoiceClientBoundFrame(0.0, 0.0, (short) 2));
                 //First double = 40 means lobby
@@ -80,7 +79,7 @@ public class PlayerListener {
         System.out.println(event.getPlayer().getName() + " joined the game!");
         server.getPlayers().put(event.getPlayer().getMId(), event.getPlayer());
         server.getChannels().stream().forEach(channel -> { //Telling the clients that there's a new player and informing the new player about current players
-            if(channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())) { //Sending the new player, which players are already in the game
+            if (channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())) { //Sending the new player, which players are already in the game
                 server.getChannels().stream().filter(playerChannel -> !playerChannel.equals(channel)).forEach(playerChannel -> {
                     Player currentPlayer = playerChannel.attr(StormCloudHandler.PLAYER).get();
                     channel.writeAndFlush(new AddPlayerClientBoundFrame(currentPlayer.getObjectIndex(), currentPlayer.getMId(), 0.0, 0.0, currentPlayer.getMId(), currentPlayer.getClazz(), 0, currentPlayer.getName()));
@@ -108,68 +107,73 @@ public class PlayerListener {
 
         //TODO: Only debugging will be handled by the command handler later
         String command = event.getMessage().split(" ")[1];
-        if(command.equals("!t")) {
-            String[] transportInfo = event.getMessage().split(" ");
-            if(transportInfo.length == 7) {
-                if(Double.valueOf(transportInfo[2]) == 40) {
-                    ingame = false;
+        switch (command) {
+            case "!t":
+                String[] transportInfo = event.getMessage().split(" ");
+                if (transportInfo.length == 7) {
+                    if (Double.valueOf(transportInfo[2]) == 40) {
+                        ingame = false;
+                    }
+                    server.getChannels().stream().forEach(channel -> {
+                        Player player = channel.attr(StormCloudHandler.PLAYER).get();
+                        //TODO: Level generation
+                        //channel.writeAndFlush(new CrewChoiceClientBoundFrame(0.0, 0.0, (short) 2));
+                        //First double = 40 means lobby
+                        //18 -> 38 different maps
+                        //41 boss level
+                        //16 end scene
+                        channel.writeAndFlush(new TransportClientBoundFrame(0.0, 0.0, Double.valueOf(transportInfo[2]), Double.valueOf(transportInfo[3]), Double.valueOf(transportInfo[4]), Double.valueOf(transportInfo[5]), Double.valueOf(transportInfo[6]), (byte) 0));
+                        //channel.writeAndFlush(new TransportClientBoundFrame(0.0, 0.0, 23.0, 1216.0, 736.0, 2440.0, 832.0, (byte) 0));
+                    });
                 }
-                server.getChannels().stream().forEach(channel -> {
-                    Player player = channel.attr(StormCloudHandler.PLAYER).get();
-                    //TODO: Level generation
-                    //channel.writeAndFlush(new CrewChoiceClientBoundFrame(0.0, 0.0, (short) 2));
-                    //First double = 40 means lobby
-                    //18 -> 38 different maps
-                    //41 boss level
-                    //16 end scene
-                    channel.writeAndFlush(new TransportClientBoundFrame(0.0, 0.0, Double.valueOf(transportInfo[2]), Double.valueOf(transportInfo[3]), Double.valueOf(transportInfo[4]), Double.valueOf(transportInfo[5]), Double.valueOf(transportInfo[6]), (byte) 0));
-                    //channel.writeAndFlush(new TransportClientBoundFrame(0.0, 0.0, 23.0, 1216.0, 736.0, 2440.0, 832.0, (byte) 0));
+                break;
+            case "!s":
+                String[] spawnInfo = event.getMessage().split(" ");
+                if (spawnInfo.length == 7) {
+                    server.getChannels().stream().forEach(channel -> {
+                        Player player = channel.attr(StormCloudHandler.PLAYER).get();
+                        channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, 0.0, Short.valueOf(spawnInfo[2]), event.getPlayer().getPosX(), event.getPlayer().getPosY(), (Short.valueOf(spawnInfo[3]) == 1 ? (byte) 1 : (byte) 0), Short.valueOf(spawnInfo[4]), Short.valueOf(spawnInfo[5]), Short.valueOf(spawnInfo[6])));
+                    });
+                }
+                break;
+            case "!w":
+                //TODO: Remove, just for debugging the possible monster cards for the map
+                Double posX = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
+                Double newEnemyMId = server.getEnemyList().size() + 100.0;
+                server.getEnemyList().put(newEnemyMId, new Enemy(newEnemyMId, 0.0, posX, (event.getPlayer().getPosY() - 300)));
+                server.getChannels().stream().forEach(channel -> { //Card 0
+                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId, (short) 0, posX, (event.getPlayer().getPosY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
                 });
-            }
-        } else if (command.equals("!s")) {
-            String[] spawnInfo = event.getMessage().split(" ");
-            if (spawnInfo.length == 7) {
-                server.getChannels().stream().forEach(channel -> {
-                    Player player = channel.attr(StormCloudHandler.PLAYER).get();
-                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, 0.0, Short.valueOf(spawnInfo[2]), event.getPlayer().getPosX(), event.getPlayer().getPosY(), (Short.valueOf(spawnInfo[3]) == 1?(byte)1:(byte)0), Short.valueOf(spawnInfo[4]), Short.valueOf(spawnInfo[5]), Short.valueOf(spawnInfo[6])));
+                Double posX1 = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
+                Double newEnemyMId1 = server.getEnemyList().size() + 100.0;
+                server.getEnemyList().put(newEnemyMId1, new Enemy(newEnemyMId1, 0.0, posX, (event.getPlayer().getPosY() - 300)));
+                server.getChannels().stream().forEach(channel -> { //Card 1
+                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId1, (short) 1, posX1, (event.getPlayer().getPosY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
                 });
-            }
-        } else if (command.equals("!w")) {
-            //TODO: Remove, just for debugging the possible monster cards for the map
-            Double posX = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
-            Double newEnemyMId = server.getEnemyList().size() + 100.0;
-            server.getEnemyList().put(newEnemyMId, new Enemy(newEnemyMId, 0.0, posX, (event.getPlayer().getPosY() - 300)));
-            server.getChannels().stream().forEach(channel -> { //Card 0
-                channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId, (short)0, posX, (event.getPlayer().getPosY() - 300), (byte)0, (short)0, (short)10, (short)1));
-            });
-            Double posX1 = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
-            Double newEnemyMId1 = server.getEnemyList().size() + 100.0;
-            server.getEnemyList().put(newEnemyMId1, new Enemy(newEnemyMId1, 0.0, posX, (event.getPlayer().getPosY() - 300)));
-            server.getChannels().stream().forEach(channel -> { //Card 1
-                channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId1, (short)1, posX1, (event.getPlayer().getPosY() - 300), (byte)0, (short)0, (short)10, (short)1));
-            });
-            Double posX2 = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
-            Double newEnemyMId2 = server.getEnemyList().size() + 100.0;
-            server.getEnemyList().put(newEnemyMId2, new Enemy(newEnemyMId2, 0.0, posX, (event.getPlayer().getPosY() - 300)));
-            server.getChannels().stream().forEach(channel -> { //Card 3
-                channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId2, (short)3, posX2, (event.getPlayer().getPosY() - 300), (byte)0, (short)0, (short)10, (short)1));
-            });
-            Double posX3 = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
-            Double newEnemyMId3 = server.getEnemyList().size() + 100.0;
-            server.getEnemyList().put(newEnemyMId3, new Enemy(newEnemyMId3, 0.0, posX, (event.getPlayer().getPosY() - 300)));
-            server.getChannels().stream().forEach(channel -> { //Card 4
-                channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId3, (short)4, posX3, (event.getPlayer().getPosY() - 300), (byte)0, (short)0, (short)10, (short)1));
-            });
-            Double posX4 = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
-            Double newEnemyMId4 = server.getEnemyList().size() + 100.0;
-            server.getEnemyList().put(newEnemyMId4, new Enemy(newEnemyMId4, 0.0, posX, (event.getPlayer().getPosY() - 300)));
-            server.getChannels().stream().forEach(channel -> { //Card 5
-                channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId4, (short)5, posX4, (event.getPlayer().getPosY() - 300), (byte)0, (short)0, (short)10, (short)1));
-            });
-        }  else {
-            server.getChannels().stream().filter(channel -> !channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
-                channel.writeAndFlush(new ChatPlayerClientBoundFrame(event.getPlayer().getObjectIndex(), event.getPlayer().getMId(), event.getMessage()));
-            });
+                Double posX2 = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
+                Double newEnemyMId2 = server.getEnemyList().size() + 100.0;
+                server.getEnemyList().put(newEnemyMId2, new Enemy(newEnemyMId2, 0.0, posX, (event.getPlayer().getPosY() - 300)));
+                server.getChannels().stream().forEach(channel -> { //Card 3
+                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId2, (short) 3, posX2, (event.getPlayer().getPosY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
+                });
+                Double posX3 = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
+                Double newEnemyMId3 = server.getEnemyList().size() + 100.0;
+                server.getEnemyList().put(newEnemyMId3, new Enemy(newEnemyMId3, 0.0, posX, (event.getPlayer().getPosY() - 300)));
+                server.getChannels().stream().forEach(channel -> { //Card 4
+                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId3, (short) 4, posX3, (event.getPlayer().getPosY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
+                });
+                Double posX4 = event.getPlayer().getPosX() - ((Math.random() * 300) - 150);
+                Double newEnemyMId4 = server.getEnemyList().size() + 100.0;
+                server.getEnemyList().put(newEnemyMId4, new Enemy(newEnemyMId4, 0.0, posX, (event.getPlayer().getPosY() - 300)));
+                server.getChannels().stream().forEach(channel -> { //Card 5
+                    channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId4, (short) 5, posX4, (event.getPlayer().getPosY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
+                });
+                break;
+            default:
+                server.getChannels().stream().filter(channel -> !channel.attr(StormCloudHandler.PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
+                    channel.writeAndFlush(new ChatPlayerClientBoundFrame(event.getPlayer().getObjectIndex(), event.getPlayer().getMId(), event.getMessage()));
+                });
+                break;
         }
 
     }
@@ -204,7 +208,7 @@ public class PlayerListener {
     public void onPlayerUpdate(PlayerUpdateEvent event) {
         event.getPlayer().setName(event.getFrame().getName().replace("|", ""));
         //event.getPlayer().setLogin(event.getPlayer().getName());
-        if(ingame) { //Ingame -> direct transport to the map
+        if (ingame) { //Ingame -> direct transport to the map
             if (event.getFrame().getClazz() == -1) { //The first player update says that this player has no clazz
                 if (server.getDisconnectedPlayers().containsKey(event.getPlayer().getLogin())) { //If there was a player on that slot he has to get the same clazz etc.
                     //event.getPlayer().setMId(oldPlayerList.get(event.getPlayer().getLogin()).getClazz());

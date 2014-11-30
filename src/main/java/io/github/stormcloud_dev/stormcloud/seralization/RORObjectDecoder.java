@@ -69,7 +69,7 @@ public class RORObjectDecoder extends ByteToMessageDecoder {
         buf.readBytes(3);
         byte id = buf.readByte();
 
-        if(id != 16) {
+        if (id != 16) {
         /* Print packets for debugging */
             int readerIndex = buf.readerIndex(), writerIndex = buf.writerIndex();
             byte[] bytes = new byte[buf.readableBytes()];

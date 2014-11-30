@@ -65,9 +65,9 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
 
     public StormCloudHandler(StormCloud server) {
         this.server = server;
-        this.playerList = new ConcurrentHashMap<Double, Player>();
-        this.disconnectedPlayerList = new ConcurrentHashMap<String, Player>();
-        this.enemyList = new ConcurrentHashMap<Double, Enemy>();
+        this.playerList = new ConcurrentHashMap<>();
+        this.disconnectedPlayerList = new ConcurrentHashMap<>();
+        this.enemyList = new ConcurrentHashMap<>();
         try {
             this.server.getEventManager().addListener(new PlayerListener(server));
         } catch(InvalidEventHandlerException e) {
@@ -77,16 +77,16 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
 
     public void scheduleTestPacket(Channel channel) {
         server.getTimer().newTimeout(timeout -> {
-            Player player = channel.attr(StormCloudHandler.PLAYER).get();
+            Player player = channel.attr(PLAYER).get();
             if (channel.isActive()) {
                 channel.writeAndFlush(new TestClientBoundFrame(player.getObjectIndex(), player.getMId()));
                 enemyList.entrySet().stream().forEach(entry -> {
                     Enemy enemy = entry.getValue();
-                    enemy.setPosX(enemy.getPosX() + 1);
+                    enemy.setX(enemy.getX() + 1);
                     enemy.setHp((short) (enemy.getHp() - 1));
-                    if(enemy.getHp() <= 0) {
-                        channel.writeAndFlush(new KeyMonsterClientBoundFrame(220.0, enemy.getMId(), enemy.getPosX(), enemy.getPosY(), (byte) 0, (byte) 0, (byte) 0, (byte) 0, (short) 1));
-                        channel.writeAndFlush(new NPCHPClientBoundFrame(220.0, enemy.getMId(), enemy.getHp(), enemy.getPosX(), enemy.getPosY(), (short) 1, (short) 1, (byte) 0));
+                    if (enemy.getHp() <= 0) {
+                        channel.writeAndFlush(new KeyMonsterClientBoundFrame(220.0, enemy.getMId(), enemy.getX(), enemy.getY(), (byte) 0, (byte) 0, (byte) 0, (byte) 0, (short) 1));
+                        channel.writeAndFlush(new NPCHPClientBoundFrame(220.0, enemy.getMId(), enemy.getHp(), enemy.getX(), enemy.getY(), (short) 1, (short) 1, (byte) 0));
                     } else {
                         channel.writeAndFlush(new MDeadClientBoundFrame(220.0, enemy.getMId()));
                     }
@@ -101,7 +101,7 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
         System.out.println("Channel active");
         //Random random = new Random();
         //Multiplayer ID's are starting at 9
-        ctx.channel().attr(StormCloudHandler.PLAYER).set(new Player(getPlayerId(9.0, ctx.channel().remoteAddress().toString().split(":")[0]), 210.0, ctx.channel().remoteAddress().toString().split(":")[0]));
+        ctx.channel().attr(PLAYER).set(new Player(getPlayerId(9.0, ctx.channel().remoteAddress().toString().split(":")[0]), 210.0, ctx.channel().remoteAddress().toString().split(":")[0]));
         channels.add(ctx.channel());
 
         ctx.writeAndFlush(Unpooled.wrappedBuffer("GM:Studio-Connect\u0000".getBytes("utf8")));
@@ -115,20 +115,20 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
 
     //The id is the start id, if its used it checks the next
     public double getPlayerId(Double id, String ip) {
-        if(disconnectedPlayerList.contains(ip)) {
+        if (disconnectedPlayerList.contains(ip)) {
             return disconnectedPlayerList.get(ip).getMId();
         }
         return getPlayerId(id);
     }
 
     public double getPlayerId(Double id) {
-        ConcurrentHashMap<Double, Player> allPlayers = new ConcurrentHashMap<Double, Player>();
+        ConcurrentHashMap<Double, Player> allPlayers = new ConcurrentHashMap<>();
         allPlayers.putAll(playerList);
         for (Map.Entry<String, Player> entry : disconnectedPlayerList.entrySet()) {
             allPlayers.put(entry.getValue().getMId(), entry.getValue());
         }
         for (Map.Entry<Double, Player> entry : allPlayers.entrySet()) {
-            if(entry.getValue().getMId() == id){
+            if (entry.getValue().getMId() == id){
                 return getPlayerId(id + 1);
             }
         }
@@ -146,28 +146,28 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         //The player that send a frame
         Player sender = ctx.channel().attr(PLAYER).get();
-        if(msg instanceof HandshakeFrame) { //These packets have to send in the exact order with exactly these values, else the client gets a black screen...
+        if (msg instanceof HandshakeFrame) { //These packets have to send in the exact order with exactly these values, else the client gets a black screen...
             ctx.writeAndFlush(Unpooled.wrappedBuffer(new byte[]{-83, -66, -81, -34, -21, -66, 13, -16, 12, 0, 0, 0}));
             //40 = Room ID of Lobby, 15 = Object Index for set player
             ctx.writeAndFlush(new SetPlayerClientBoundFrame(15.0, 0.0, sender.getMId(), 40.0, "v1.2.4"));
             ctx.writeAndFlush(new UpdateDiffClientBoundFrame(0.0, 0.0, (byte) 2, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0));
             //We tell the player listener that there's a new player
             server.getEventManager().onEvent(new PlayerAddEvent(sender));
-        } else if(msg instanceof ChatPlayerServerBoundFrame) {
+        } else if (msg instanceof ChatPlayerServerBoundFrame) {
             ChatPlayerServerBoundFrame serverFrame = ((ChatPlayerServerBoundFrame)msg);
             server.getEventManager().onEvent(new PlayerChatEvent(sender, serverFrame));
-        } else if(msg instanceof UpdatePlayerServerBoundFrame) {
+        } else if (msg instanceof UpdatePlayerServerBoundFrame) {
             UpdatePlayerServerBoundFrame serverFrame = ((UpdatePlayerServerBoundFrame)msg);
             server.getEventManager().onEvent(new PlayerUpdateEvent(sender, serverFrame));
-        } else if(msg instanceof LagPlayerServerBoundFrame) {
+        } else if (msg instanceof LagPlayerServerBoundFrame) {
             server.getEventManager().onEvent(new PlayerLagEvent(sender));
-        } else if(msg instanceof SetReadyServerBoundFrame) {
+        } else if (msg instanceof SetReadyServerBoundFrame) {
             SetReadyServerBoundFrame serverFrame = ((SetReadyServerBoundFrame)msg);
             server.getEventManager().onEvent(new PlayerReadyChangeEvent(sender, serverFrame));
-        } else if(msg instanceof PositionInfoServerBoundFrame) {
+        } else if (msg instanceof PositionInfoServerBoundFrame) {
             PositionInfoServerBoundFrame serverFrame = ((PositionInfoServerBoundFrame)msg);
             server.getEventManager().onEvent(new PlayerPositionEvent(sender, serverFrame));
-        } else if(msg instanceof KeyPlayerServerBoundFrame) {
+        } else if (msg instanceof KeyPlayerServerBoundFrame) {
             KeyPlayerServerBoundFrame serverFrame = ((KeyPlayerServerBoundFrame)msg);
             server.getEventManager().onEvent(new PlayerKeyEvent(sender, serverFrame));
         } else {

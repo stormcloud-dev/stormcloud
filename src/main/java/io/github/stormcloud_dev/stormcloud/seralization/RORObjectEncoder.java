@@ -39,7 +39,7 @@ public class RORObjectEncoder extends MessageToByteEncoder<Frame> {
             exception.printStackTrace();
         }
 
-        if(!(frame instanceof TestClientBoundFrame) && !(frame instanceof LagPlayerClientBoundFrame)) {
+        if (!(frame instanceof TestClientBoundFrame) && !(frame instanceof LagPlayerClientBoundFrame)) {
             // Print packets for debugging
             int readerIndex = buf.readerIndex(), writerIndex = buf.writerIndex();
             byte[] bytes = new byte[buf.readableBytes()];

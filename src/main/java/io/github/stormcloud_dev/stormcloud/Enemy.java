@@ -18,41 +18,41 @@ package io.github.stormcloud_dev.stormcloud;
 
 public class Enemy {
 
-    private double MId, objectIndex;
+    private double mId, objectIndex;
 
     private short hp;
-    private double PosX;
-    private double PosY;
+    private double x;
+    private double y;
 
-    public Enemy(double MId, double objectIndex, double PosX, double PosY) {
-        this.MId = MId;
+    public Enemy(double mId, double objectIndex, double x, double y) {
+        this.mId = mId;
         this.objectIndex = objectIndex;
-        this.PosX = PosX;
-        this.PosY = PosY;
+        this.x = x;
+        this.y = y;
     }
 
     public double getMId() {
-        return MId;
+        return mId;
     }
 
     public double getObjectIndex() {
         return objectIndex;
     }
 
-    public double getPosY() {
-        return PosY;
+    public double getY() {
+        return y;
     }
 
-    public void setPosY(double PosY) {
-        this.PosY = PosY;
+    public void setY(double PosY) {
+        this.y = PosY;
     }
 
-    public double getPosX() {
-        return PosX;
+    public double getX() {
+        return x;
     }
 
-    public void setPosX(double PosX) {
-        this.PosX = PosX;
+    public void setX(double PosX) {
+        this.x = PosX;
     }
 
     public short getHp() {
