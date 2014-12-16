@@ -142,33 +142,33 @@ public class PlayerListener {
                 break;
             case "!w":
                 //TODO: Remove, just for debugging the possible monster cards for the map
-                Double posX = event.getPlayer().getX() - ((Math.random() * 300) - 150);
-                Double newEnemyMId = server.getEnemyList().size() + 100.0;
-                server.getEnemyList().put(newEnemyMId, new Enemy(newEnemyMId, 0.0, posX, (event.getPlayer().getY() - 300)));
+                double posX = event.getPlayer().getX() - ((Math.random() * 300) - 150);
+                double newEnemyMId = server.getEnemyList().size() + 100.0;
+                server.getEnemyList().put(newEnemyMId, new Enemy(newEnemyMId, 0.0, (int) posX, (event.getPlayer().getY() - 300)));
                 server.getChannels().stream().forEach(channel -> { //Card 0
                     channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId, (short) 0, posX, (event.getPlayer().getY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
                 });
-                Double posX1 = event.getPlayer().getX() - ((Math.random() * 300) - 150);
-                Double newEnemyMId1 = server.getEnemyList().size() + 100.0;
-                server.getEnemyList().put(newEnemyMId1, new Enemy(newEnemyMId1, 0.0, posX, (event.getPlayer().getY() - 300)));
+                double posX1 = event.getPlayer().getX() - ((Math.random() * 300) - 150);
+                double newEnemyMId1 = server.getEnemyList().size() + 100.0;
+                server.getEnemyList().put(newEnemyMId1, new Enemy(newEnemyMId1, 0.0, (int) posX, (event.getPlayer().getY() - 300)));
                 server.getChannels().stream().forEach(channel -> { //Card 1
                     channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId1, (short) 1, posX1, (event.getPlayer().getY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
                 });
-                Double posX2 = event.getPlayer().getX() - ((Math.random() * 300) - 150);
-                Double newEnemyMId2 = server.getEnemyList().size() + 100.0;
-                server.getEnemyList().put(newEnemyMId2, new Enemy(newEnemyMId2, 0.0, posX, (event.getPlayer().getY() - 300)));
+                double posX2 = event.getPlayer().getX() - ((Math.random() * 300) - 150);
+                double newEnemyMId2 = server.getEnemyList().size() + 100.0;
+                server.getEnemyList().put(newEnemyMId2, new Enemy(newEnemyMId2, 0.0, (int) posX, (event.getPlayer().getY() - 300)));
                 server.getChannels().stream().forEach(channel -> { //Card 3
                     channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId2, (short) 3, posX2, (event.getPlayer().getY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
                 });
-                Double posX3 = event.getPlayer().getX() - ((Math.random() * 300) - 150);
-                Double newEnemyMId3 = server.getEnemyList().size() + 100.0;
-                server.getEnemyList().put(newEnemyMId3, new Enemy(newEnemyMId3, 0.0, posX, (event.getPlayer().getY() - 300)));
+                double posX3 = event.getPlayer().getX() - ((Math.random() * 300) - 150);
+                double newEnemyMId3 = server.getEnemyList().size() + 100.0;
+                server.getEnemyList().put(newEnemyMId3, new Enemy(newEnemyMId3, 0.0, (int) posX, (event.getPlayer().getY() - 300)));
                 server.getChannels().stream().forEach(channel -> { //Card 4
                     channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId3, (short) 4, posX3, (event.getPlayer().getY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
                 });
-                Double posX4 = event.getPlayer().getX() - ((Math.random() * 300) - 150);
-                Double newEnemyMId4 = server.getEnemyList().size() + 100.0;
-                server.getEnemyList().put(newEnemyMId4, new Enemy(newEnemyMId4, 0.0, posX, (event.getPlayer().getY() - 300)));
+                double posX4 = event.getPlayer().getX() - ((Math.random() * 300) - 150);
+                double newEnemyMId4 = server.getEnemyList().size() + 100.0;
+                server.getEnemyList().put(newEnemyMId4, new Enemy(newEnemyMId4, 0.0, (int) posX, (event.getPlayer().getY() - 300)));
                 server.getChannels().stream().forEach(channel -> { //Card 5
                     channel.writeAndFlush(new SpawnClassicClientBoundFrame(0.0, newEnemyMId4, (short) 5, posX4, (event.getPlayer().getY() - 300), (byte) 0, (short) 0, (short) 10, (short) 1));
                 });
@@ -192,8 +192,8 @@ public class PlayerListener {
     @EventHandler
     public void onPlayerPosition(PlayerPositionEvent event) {
         //System.out.println(event.getPlayer().getName() + " moves to " + event.getFrame().getX() + "/" + event.getFrame().getY());
-        event.getPlayer().setX(event.getFrame().getX());
-        event.getPlayer().setY(event.getFrame().getY());
+        event.getPlayer().setX((int) event.getFrame().getX());
+        event.getPlayer().setY((int) event.getFrame().getY());
         server.getChannels().stream().filter(channel -> !channel.attr(PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
             //Object Index of 167 required (seems to be the index for position updates)
             channel.writeAndFlush(new PositionInfoClientBoundFrame(167.0, event.getPlayer().getMId(), event.getFrame().getX(), event.getFrame().getY(), event.getFrame().getLeft(), event.getFrame().getRight(), event.getFrame().getJump(), event.getFrame().getJumpHeld(), event.getFrame().getUp(), event.getFrame().getDown()));

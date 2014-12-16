@@ -13,15 +13,17 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+
 package io.github.stormcloud_dev.stormcloud.object;
 
-public class Block extends StormCloudObject {
+public class Rope extends StormCloudObject {
 
-    public Block(int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
+    public Rope(int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
         super(x, y, name, locked, code, scaleX, scaleY, colour, rotation);
     }
 
-    public Block(int x, int y) {
+    public Rope(int x, int y) {
         super(x, y);
     }
+
 }
