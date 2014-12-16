@@ -13,10 +13,11 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package io.github.stormcloud_dev.stormcloud.event.player;
+package io.github.stormcloud_dev.stormcloud.listener;
 
 import io.github.stormcloud_dev.stormcloud.*;
 import io.github.stormcloud_dev.stormcloud.event.EventHandler;
+import io.github.stormcloud_dev.stormcloud.event.player.*;
 import io.github.stormcloud_dev.stormcloud.frame.clientbound.*;
 import io.github.stormcloud_dev.stormcloud.object.Enemy;
 import io.github.stormcloud_dev.stormcloud.object.Player;
