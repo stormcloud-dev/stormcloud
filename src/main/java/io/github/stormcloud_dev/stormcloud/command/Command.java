@@ -15,7 +15,7 @@
  */
 package io.github.stormcloud_dev.stormcloud.command;
 
-import io.github.stormcloud_dev.stormcloud.Player;
+import io.github.stormcloud_dev.stormcloud.object.Player;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

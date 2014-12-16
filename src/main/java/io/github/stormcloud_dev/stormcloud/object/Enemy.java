@@ -1,5 +1,3 @@
-package io.github.stormcloud_dev.stormcloud;
-
 /*
  *   Copyright 2014 StormCloud Development Group
  *
@@ -15,20 +13,18 @@ package io.github.stormcloud_dev.stormcloud;
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+package io.github.stormcloud_dev.stormcloud.object;
 
-public class Enemy {
+public class Enemy extends StormCloudObject {
 
     private double mId, objectIndex;
 
     private short hp;
-    private double x;
-    private double y;
 
-    public Enemy(double mId, double objectIndex, double x, double y) {
+    public Enemy(double mId, double objectIndex, int x, int y) {
+        super(x, y);
         this.mId = mId;
         this.objectIndex = objectIndex;
-        this.x = x;
-        this.y = y;
     }
 
     public double getMId() {
@@ -37,22 +33,6 @@ public class Enemy {
 
     public double getObjectIndex() {
         return objectIndex;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double PosY) {
-        this.y = PosY;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double PosX) {
-        this.x = PosX;
     }
 
     public short getHp() {

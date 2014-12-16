@@ -17,6 +17,8 @@ package io.github.stormcloud_dev.stormcloud;
 
 import io.github.stormcloud_dev.stormcloud.command.CommandManager;
 import io.github.stormcloud_dev.stormcloud.event.EventManager;
+import io.github.stormcloud_dev.stormcloud.object.Enemy;
+import io.github.stormcloud_dev.stormcloud.object.Player;
 import io.github.stormcloud_dev.stormcloud.seralization.RORObjectDecoder;
 import io.github.stormcloud_dev.stormcloud.seralization.RORObjectEncoder;
 import io.netty.bootstrap.ServerBootstrap;

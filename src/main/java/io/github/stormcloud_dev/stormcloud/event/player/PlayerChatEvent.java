@@ -15,7 +15,7 @@
  */
 package io.github.stormcloud_dev.stormcloud.event.player;
 
-import io.github.stormcloud_dev.stormcloud.Player;
+import io.github.stormcloud_dev.stormcloud.object.Player;
 import io.github.stormcloud_dev.stormcloud.event.Event;
 import io.github.stormcloud_dev.stormcloud.frame.serverbound.ChatPlayerServerBoundFrame;
 

@@ -15,6 +15,7 @@
  */
 package io.github.stormcloud_dev.stormcloud;
 
+import io.github.stormcloud_dev.stormcloud.object.Player;
 import io.netty.util.AttributeKey;
 
 public class Attribute {

@@ -1,5 +1,3 @@
-package io.github.stormcloud_dev.stormcloud;
-
 /*
  *   Copyright 2014 StormCloud Development Group
  *
@@ -15,13 +13,16 @@ package io.github.stormcloud_dev.stormcloud;
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+package io.github.stormcloud_dev.stormcloud.object;
+
+import io.github.stormcloud_dev.stormcloud.CrewMember;
 
 import static java.lang.Math.max;
 import static java.lang.System.currentTimeMillis;
 
-public class Player {
+public class Player extends StormCloudObject {
 
-    private double MId, objectIndex;
+    private double mId, objectIndex;
 
     private String name;
     private String login;
@@ -32,25 +33,22 @@ public class Player {
     private long vCooldown;
     private long useItemCooldown;
     private long lastPing;
-    private double x;
-    private double y;
     private boolean ready;
 
-    public Player(double MId, double objectIndex, String login) {
-        this.MId = MId;
+    public Player(double mId, double objectIndex, String login) {
+        super(0, 0);
+        this.mId = mId;
         this.objectIndex = objectIndex;
         this.name = "Player";
         this.login = login;
-        this.x = 0.0;
-        this.y = 0.0;
     }
 
     public double getMId() {
-        return MId;
+        return mId;
     }
 
-    public void setMId(double MId) {
-        this.MId = MId;
+    public void setMId(double mId) {
+        this.mId = mId;
     }
 
     public double getObjectIndex() {
@@ -144,22 +142,5 @@ public class Player {
     public void setReady(boolean ready) {
         this.ready = ready;
     }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double PosY) {
-        this.y = PosY;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double PosX) {
-        this.x = PosX;
-    }
-
 
 }
