@@ -20,7 +20,7 @@ import io.netty.buffer.ByteBuf;
 
 public class UpdatePlayerServerBoundFrame extends ServerBoundFrame {
 
-    private int clazz;
+    private int clazz; // class is a reserved word
     private double x;
     private double y;
     private String name;

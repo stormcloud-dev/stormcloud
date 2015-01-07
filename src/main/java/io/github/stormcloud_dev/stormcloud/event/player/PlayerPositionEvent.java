@@ -20,20 +20,67 @@ import io.github.stormcloud_dev.stormcloud.event.Event;
 import io.github.stormcloud_dev.stormcloud.frame.serverbound.PositionInfoServerBoundFrame;
 
 public class PlayerPositionEvent extends Event {
-    private Player player;
 
-    private PositionInfoServerBoundFrame frame;
+    private Player player;
+    private double x;
+    private double y;
+    private boolean left;
+    private boolean right;
+    private boolean jump;
+    private boolean jumpHeld;
+    private boolean up;
+    private boolean down;
 
     public PlayerPositionEvent(Player player, PositionInfoServerBoundFrame frame) {
+        this(player, frame.getX(), frame.getY(), frame.getLeft() == 1, frame.getRight() == 1, frame.getJump() == 1, frame.getJumpHeld() == 1, frame.getUp() == 1, frame.getDown() == 1);
+    }
+
+    public PlayerPositionEvent(Player player, double x, double y, boolean left, boolean right, boolean jump, boolean jumpHeld, boolean up, boolean down) {
         this.player = player;
-        this.frame = frame;
+        this.x = x;
+        this.y = y;
+        this.left = left;
+        this.right = right;
+        this.jump = jump;
+        this.jumpHeld = jumpHeld;
+        this.up = up;
+        this.down = down;
     }
 
     public Player getPlayer() {
         return player;
     }
 
-    public PositionInfoServerBoundFrame getFrame() {
-        return frame;
+    public double getX() {
+        return x;
     }
+
+    public double getY() {
+        return y;
+    }
+
+    public boolean isLeft() {
+        return left;
+    }
+
+    public boolean isRight() {
+        return right;
+    }
+
+    public boolean isJump() {
+        return jump;
+    }
+
+    public boolean isJumpHeld() {
+        return jumpHeld;
+    }
+
+    public boolean isUp() {
+        return up;
+    }
+
+    public boolean isDown() {
+        return down;
+    }
+
 }
