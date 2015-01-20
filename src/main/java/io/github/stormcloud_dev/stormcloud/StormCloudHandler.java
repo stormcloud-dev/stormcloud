@@ -15,12 +15,10 @@
  */
 package io.github.stormcloud_dev.stormcloud;
 
-import io.github.stormcloud_dev.stormcloud.event.InvalidEventHandlerException;
 import io.github.stormcloud_dev.stormcloud.event.player.*;
 import io.github.stormcloud_dev.stormcloud.frame.HandshakeFrame;
 import io.github.stormcloud_dev.stormcloud.frame.clientbound.*;
 import io.github.stormcloud_dev.stormcloud.frame.serverbound.*;
-import io.github.stormcloud_dev.stormcloud.listener.PlayerListener;
 import io.github.stormcloud_dev.stormcloud.object.Enemy;
 import io.github.stormcloud_dev.stormcloud.object.Player;
 import io.netty.buffer.Unpooled;
