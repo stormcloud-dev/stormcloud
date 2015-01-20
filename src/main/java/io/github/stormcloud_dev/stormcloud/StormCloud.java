@@ -19,6 +19,7 @@ import io.github.stormcloud_dev.stormcloud.command.*;
 import io.github.stormcloud_dev.stormcloud.event.EventManager;
 import io.github.stormcloud_dev.stormcloud.object.Enemy;
 import io.github.stormcloud_dev.stormcloud.object.Player;
+import io.github.stormcloud_dev.stormcloud.room.RoomManager;
 import io.github.stormcloud_dev.stormcloud.seralization.RORObjectDecoder;
 import io.github.stormcloud_dev.stormcloud.seralization.RORObjectEncoder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -32,11 +33,16 @@ import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
+
+import static java.lang.String.format;
 
 public class StormCloud {
 
     private int port;
     private Timer timer;
+
+    private Logger logger;
 
     private StormCloudHandler handler;
 
@@ -56,15 +62,20 @@ public class StormCloud {
 
     private CommandManager commandManager;
     private EventManager eventManager;
+    private RoomManager roomManager;
 
     public StormCloud(int port) {
         this.port = port;
+        logger = Logger.getLogger(getClass().getName());
         timer = new HashedWheelTimer();
         commandManager = new CommandManager();
         eventManager = new EventManager();
+        roomManager = new RoomManager(this);
+        roomManager.loadRooms();
     }
 
     public void run() throws InterruptedException {
+        getLogger().info(format("Starting server on port %d", port));
         try {
             getCommandManager().addCommand(new SpawnCommand(this));
             getCommandManager().addCommand(new TransportCommand(this));
@@ -98,6 +109,10 @@ public class StormCloud {
         return timer;
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
+
     public CommandManager getCommandManager() {
         return commandManager;
     }
@@ -113,7 +128,6 @@ public class StormCloud {
                 port = Integer.parseInt(args[0]);
             } catch (NumberFormatException ignored) {}
         }
-        System.out.println("Listening on port: " + port);
         new StormCloud(port).run();
     }
 

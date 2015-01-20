@@ -36,18 +36,21 @@ import java.util.Set;
 
 import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
+import static java.lang.Long.parseLong;
 import static java.lang.String.format;
 
 public class Room {
 
+    private String name;
     private Set<StormCloudObject> objects;
 
-    public Room() {
+    public Room(String name) {
+        this.name = name;
         objects = new HashSet<>();
     }
 
     public static Room load(String roomName) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
-        Room room = new Room();
+        Room room = new Room(roomName);
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document = builder.parse(Room.class.getResourceAsStream(format("/rooms/%s.xml", roomName)));
         XPath xPath = XPathFactory.newInstance().newXPath();
@@ -63,11 +66,15 @@ public class Room {
             String code = attributes.getNamedItem("code").getNodeValue();
             double scaleX = parseDouble(attributes.getNamedItem("scaleX").getNodeValue());
             double scaleY = parseDouble(attributes.getNamedItem("scaleY").getNodeValue());
-            int colour = parseInt(attributes.getNamedItem("colour").getNodeValue());
+            long colour = parseLong(attributes.getNamedItem("colour").getNodeValue());
             double rotation = parseDouble(attributes.getNamedItem("rotation").getNodeValue());
             room.addObject(StormCloudObjectFactory.createObject(objName, x, y, name, locked, code, scaleX, scaleY, colour, rotation));
         }
         return room;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void addObject(StormCloudObject object) {

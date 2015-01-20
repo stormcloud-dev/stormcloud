@@ -93,7 +93,7 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("Channel active");
+        server.getLogger().info("Channel active: " + ctx.channel());
         //Random random = new Random();
         //Multiplayer ID's are starting at 9
         ctx.channel().attr(PLAYER).set(new Player(getPlayerId(9.0, ctx.channel().remoteAddress().toString().split(":")[0]), 210.0, ctx.channel().remoteAddress().toString().split(":")[0]));
@@ -132,17 +132,20 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("Channel inactive");
+        server.getLogger().info("Channel inactive: " + ctx.channel());
         //Removing the player
-        PlayerRemoveEvent event = new PlayerRemoveEvent(ctx.channel().attr(PLAYER).get());
-        server.getEventManager().onEvent(event);
-        System.out.println(event.getPlayer().getName() + " left the game!");
-        server.getChannels().stream().filter(channel -> !channel.attr(PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
-            channel.writeAndFlush(new DisPlayerClientBoundFrame(event.getPlayer().getObjectIndex(), event.getPlayer().getMId()));
-            channel.writeAndFlush(new ChatPlayerClientBoundFrame(event.getPlayer().getObjectIndex(), 0.0, "'" + event.getPlayer().getName() + "' has left the game!"));
-        });
-        server.getDisconnectedPlayers().put(event.getPlayer().getLogin(), event.getPlayer());
-        server.getPlayers().remove(event.getPlayer().getMId());
+        Player player = ctx.channel().attr(PLAYER).get();
+        if (player != null) {
+            PlayerRemoveEvent event = new PlayerRemoveEvent(player);
+            server.getEventManager().onEvent(event);
+            server.getLogger().info(event.getPlayer().getName() + " left the game!");
+            server.getChannels().stream().filter(channel -> !channel.attr(PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
+                channel.writeAndFlush(new DisPlayerClientBoundFrame(event.getPlayer().getObjectIndex(), event.getPlayer().getMId()));
+                channel.writeAndFlush(new ChatPlayerClientBoundFrame(event.getPlayer().getObjectIndex(), 0.0, "'" + event.getPlayer().getName() + "' has left the game!"));
+            });
+            server.getDisconnectedPlayers().put(event.getPlayer().getLogin(), event.getPlayer());
+            server.getPlayers().remove(event.getPlayer().getMId());
+        }
     }
 
     @Override
@@ -157,7 +160,7 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
             //We tell the player listener that there's a new player
             PlayerAddEvent event = new PlayerAddEvent(sender);
             server.getEventManager().onEvent(new PlayerAddEvent(sender));
-            System.out.println(event.getPlayer().getName() + " joined the game!");
+            server.getLogger().info(event.getPlayer().getName() + " joined the game!");
             server.getPlayers().put(event.getPlayer().getMId(), event.getPlayer());
             server.getChannels().stream().forEach(channel -> { //Telling the clients that there's a new player and informing the new player about current players
                 if (channel.attr(PLAYER).get().equals(event.getPlayer())) { //Sending the new player, which players are already in the game
@@ -227,7 +230,7 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
                     return; // We won't remove the character selection if it was already set
                 }
             }
-            System.out.println(event.getPlayer().getName() + " changed class to " + event.getFrame().getClazz());
+            server.getLogger().info(event.getPlayer().getName() + " changed class to " + event.getFrame().getClazz());
             event.getPlayer().setClazz((event.getFrame().getClazz() != -1 ? CrewMember.values()[event.getFrame().getClazz()] : null));
             server.getChannels().stream().filter(channel -> !channel.attr(PLAYER).get().equals(event.getPlayer())).forEach(channel -> {
                 // Object Index of 210 required (seems to be the index for player updates)
@@ -241,7 +244,7 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
             SetReadyServerBoundFrame frame = (SetReadyServerBoundFrame) msg;
             PlayerReadyChangeEvent event = new PlayerReadyChangeEvent(sender, frame);
             server.getEventManager().onEvent(event);
-            System.out.println(event.getPlayer().getName() + " is ready!");
+            server.getLogger().info(event.getPlayer().getName() + " is ready!");
             server.getPlayers().get(event.getPlayer().getMId()).setReady(event.isReady());
             //Check if all players are ready
             boolean allReady = true;
@@ -261,7 +264,7 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
                     });
                 });
             } else if (allReady) { //If all players are ready, we send the frames to start the game
-                System.out.println("All players are ready... game starting!");
+                server.getLogger().info("All players are ready... game starting!");
                 //Random random = new Random();
                 server.getChannels().stream().forEach(channel -> {
                     //Player player = channel.attr(PLAYER).get();
@@ -297,7 +300,7 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
                 channel.writeAndFlush(new KeyPlayerClientBoundFrame(167.0, event.getPlayer().getMId(), event.getFrame().getX(), event.getFrame().getY(), event.getFrame().getZAction(), event.getFrame().getXAction(), event.getFrame().getCAction(), event.getFrame().getVAction(), event.getFrame().getItemUsed(), event.getFrame().getUnknown()));
             });
         } else {
-            System.out.println(msg.getClass().getSimpleName());
+            server.getLogger().info(msg.getClass().getSimpleName());
         }
 
 //        if (msg instanceof ByteBuf) {

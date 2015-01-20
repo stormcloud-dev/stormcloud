@@ -22,8 +22,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
-import java.util.Arrays;
-
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 
 public class RORObjectEncoder extends MessageToByteEncoder<Frame> {
@@ -40,12 +38,12 @@ public class RORObjectEncoder extends MessageToByteEncoder<Frame> {
         }
 
         if (!(frame instanceof TestClientBoundFrame) && !(frame instanceof LagPlayerClientBoundFrame)) {
-            // Print packets for debugging
             int readerIndex = buf.readerIndex(), writerIndex = buf.writerIndex();
             byte[] bytes = new byte[buf.readableBytes()];
             buf.readBytes(buf.readableBytes()).readBytes(bytes);
             buf.setIndex(readerIndex, writerIndex);
-            System.out.println("SEND " + frame.getClass().getSimpleName() + " TO " + ctx.channel().remoteAddress() + " - " + Arrays.toString(bytes));
+            // Print packets - debugging purposes
+            //System.out.println("SEND " + frame.getClass().getSimpleName() + " TO " + ctx.channel().remoteAddress() + " - " + Arrays.toString(bytes));
         }
 
     }
