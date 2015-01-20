@@ -17,7 +17,6 @@ package io.github.stormcloud_dev.stormcloud;
 
 import io.github.stormcloud_dev.stormcloud.command.*;
 import io.github.stormcloud_dev.stormcloud.event.EventManager;
-import io.github.stormcloud_dev.stormcloud.object.Enemy;
 import io.github.stormcloud_dev.stormcloud.object.Player;
 import io.github.stormcloud_dev.stormcloud.room.RoomManager;
 import io.github.stormcloud_dev.stormcloud.seralization.RORObjectDecoder;
@@ -55,9 +54,6 @@ public class StormCloud {
     }
     public ConcurrentHashMap<String, Player> getDisconnectedPlayers() {
         return handler.getDisconnectedPlayers();
-    }
-    public ConcurrentHashMap<Double, Enemy> getEnemyList() {
-        return handler.getEnemyList();
     }
 
     private CommandManager commandManager;
