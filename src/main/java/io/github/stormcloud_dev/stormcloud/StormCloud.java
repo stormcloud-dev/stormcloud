@@ -121,6 +121,10 @@ public class StormCloud {
         return eventManager;
     }
 
+    public RoomManager getRoomManager() {
+        return roomManager;
+    }
+
     public static void main(String[] args) throws InterruptedException {
         int port = 11100;
         if (args.length > 0) {

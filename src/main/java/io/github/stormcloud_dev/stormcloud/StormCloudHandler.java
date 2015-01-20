@@ -54,11 +54,6 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
         return disconnectedPlayerList;
     }
 
-    private ConcurrentHashMap<Double, Enemy> enemyList;
-    public ConcurrentHashMap<Double, Enemy> getEnemyList() {
-        return enemyList;
-    }
-
     private volatile boolean ingame;
 
     private StormCloud server;
@@ -67,7 +62,6 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
         this.server = server;
         this.playerList = new ConcurrentHashMap<>();
         this.disconnectedPlayerList = new ConcurrentHashMap<>();
-        this.enemyList = new ConcurrentHashMap<>();
     }
 
     public void scheduleTestPacket(Channel channel) {
@@ -75,17 +69,19 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
             Player player = channel.attr(PLAYER).get();
             if (channel.isActive()) {
                 channel.writeAndFlush(new TestClientBoundFrame(player.getObjectIndex(), player.getMId()));
-                enemyList.entrySet().stream().forEach(entry -> {
-                    Enemy enemy = entry.getValue();
-                    enemy.setX(enemy.getX() + 1);
-                    enemy.setHp((short) (enemy.getHp() - 1));
-                    if (enemy.getHp() <= 0) {
-                        channel.writeAndFlush(new KeyMonsterClientBoundFrame(220.0, enemy.getMId(), enemy.getX(), enemy.getY(), (byte) 0, (byte) 0, (byte) 0, (byte) 0, (short) 1));
-                        channel.writeAndFlush(new NPCHPClientBoundFrame(220.0, enemy.getMId(), enemy.getHp(), enemy.getX(), enemy.getY(), (short) 1, (short) 1, (byte) 0));
-                    } else {
-                        channel.writeAndFlush(new MDeadClientBoundFrame(220.0, enemy.getMId()));
-                    }
-                });
+                if (player.getRoom() != null) {
+                    player.getRoom().getObjects().stream().filter(object -> object instanceof Enemy).forEach(object -> {
+                        Enemy enemy = (Enemy) object;
+                        enemy.setX(enemy.getX() + 1);
+                        enemy.setHp((short) (enemy.getHp() - 1));
+                        if (enemy.getHp() > 0) {
+                            channel.writeAndFlush(new KeyMonsterClientBoundFrame(220.0, enemy.getMId(), enemy.getX(), enemy.getY(), (byte) 0, (byte) 0, (byte) 0, (byte) 0, (short) 1));
+                            channel.writeAndFlush(new NPCHPClientBoundFrame(220.0, enemy.getMId(), enemy.getHp(), enemy.getX(), enemy.getY(), (short) 1, (short) 1, (byte) 0));
+                        } else {
+                            channel.writeAndFlush(new MDeadClientBoundFrame(220.0, enemy.getMId()));
+                        }
+                    });
+                }
                 scheduleTestPacket(channel);
             }
         }, 1, SECONDS);
@@ -96,7 +92,9 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
         server.getLogger().info("Channel active: " + ctx.channel());
         //Random random = new Random();
         //Multiplayer ID's are starting at 9
-        ctx.channel().attr(PLAYER).set(new Player(getPlayerId(9.0, ctx.channel().remoteAddress().toString().split(":")[0]), 210.0, ctx.channel().remoteAddress().toString().split(":")[0]));
+        Player player = new Player(getPlayerId(9.0, ctx.channel().remoteAddress().toString().split(":")[0]), 210.0, ctx.channel().remoteAddress().toString().split(":")[0]);
+        player.setChannel(ctx.channel());
+        ctx.channel().attr(PLAYER).set(player);
         channels.add(ctx.channel());
 
         ctx.writeAndFlush(Unpooled.wrappedBuffer("GM:Studio-Connect\u0000".getBytes("utf8")));

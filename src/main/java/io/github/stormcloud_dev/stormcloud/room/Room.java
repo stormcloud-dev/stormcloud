@@ -31,6 +31,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -80,6 +81,15 @@ public class Room {
     public void addObject(StormCloudObject object) {
         if (object == null || objects.contains(object)) return;
         objects.add(object);
+    }
+
+    public void removeObject(StormCloudObject object) {
+        if (object == null || !objects.contains(object)) return;
+        objects.remove(object);
+    }
+
+    public Collection<StormCloudObject> getObjects() {
+        return objects;
     }
 
 }

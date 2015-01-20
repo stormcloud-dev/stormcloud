@@ -19,16 +19,16 @@ import io.netty.buffer.ByteBuf;
 
 public class TransportClientBoundFrame extends ClientBoundFrame {
 
-    private double unknown1;
+    private double roomId;
     private double unknown2;
     private double unknown3;
     private double unknown4;
     private double unknown5;
     private byte unknown6;
 
-    public TransportClientBoundFrame(double objectIndex, double multiplayerId, double unknown1, double unknown2, double unknown3, double unknown4, double unknown5, byte unknown6) {
+    public TransportClientBoundFrame(double objectIndex, double multiplayerId, double roomId, double unknown2, double unknown3, double unknown4, double unknown5, byte unknown6) {
         super((byte) 18, objectIndex, multiplayerId);
-        this.unknown1 = unknown1;
+        this.roomId = roomId;
         this.unknown2 = unknown2;
         this.unknown3 = unknown3;
         this.unknown4 = unknown4;
@@ -41,8 +41,8 @@ public class TransportClientBoundFrame extends ClientBoundFrame {
         return 58;
     }
 
-    public double getUnknown1() {
-        return unknown1;
+    public double getRoomId() {
+        return roomId;
     }
 
     public double getUnknown2() {
@@ -68,7 +68,7 @@ public class TransportClientBoundFrame extends ClientBoundFrame {
     @Override
     public void writeData(ByteBuf buf) {
         super.writeData(buf);
-        buf.writeDouble(getUnknown1());
+        buf.writeDouble(getRoomId());
         buf.writeDouble(getUnknown2());
         buf.writeDouble(getUnknown3());
         buf.writeDouble(getUnknown4());

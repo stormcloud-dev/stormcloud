@@ -40,18 +40,13 @@ public class TransportCommand {
     public void onTransportCommand(Player sender, String[] args) {
         if (args.length >= 6) {
             // This is for going back to the lobby. Right now, this is ignored.
-//            if (parseDouble(transportInfo[2]) == 40) {
-//                //ingame = false;
-//            }
-            server.getChannels().stream().forEach(channel -> {
-                //TODO: We need to do some stuff with setting room here, and enemy spawning needs to be done.
-                // Room loading is now mostly done (see io.github.stormcloud_dev.stormcloud.room.Room)
-                // First double = 40 means lobby
-                // 18 -> 38 different maps
-                // 41 boss level
-                // 16 end scene
-                channel.writeAndFlush(new TransportClientBoundFrame(0.0, 0.0, parseDouble(args[1]), parseDouble(args[2]), parseDouble(args[3]), parseDouble(args[4]), parseDouble(args[5]), (byte) 0));
-            });
+            if (parseDouble(args[1]) == 40) {
+                return;
+                //ingame = false;
+            }
+            double roomId = parseDouble(args[1]);
+            sender.setRoom(server.getRoomManager().getRoomById((int) roomId));
+            sender.sendFrame(new TransportClientBoundFrame(0.0, 0.0, roomId, parseDouble(args[2]), parseDouble(args[3]), parseDouble(args[4]), parseDouble(args[5]), (byte) 0));
         }
     }
 

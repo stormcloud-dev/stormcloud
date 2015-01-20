@@ -16,11 +16,16 @@
 package io.github.stormcloud_dev.stormcloud.object;
 
 import io.github.stormcloud_dev.stormcloud.CrewMember;
+import io.github.stormcloud_dev.stormcloud.frame.clientbound.ClientBoundFrame;
+import io.github.stormcloud_dev.stormcloud.room.Room;
+import io.netty.channel.Channel;
 
 import static java.lang.Math.max;
 import static java.lang.System.currentTimeMillis;
 
 public class Player extends StormCloudObject {
+
+    private Channel channel;
 
     private double mId, objectIndex;
 
@@ -35,12 +40,26 @@ public class Player extends StormCloudObject {
     private long lastPing;
     private boolean ready;
 
+    private Room room;
+
     public Player(double mId, double objectIndex, String login) {
         super(0, 0);
         this.mId = mId;
         this.objectIndex = objectIndex;
         this.name = "Player";
         this.login = login;
+    }
+
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
+    public void sendFrame(ClientBoundFrame frame) {
+        getChannel().writeAndFlush(frame);
     }
 
     public double getMId() {
@@ -141,6 +160,16 @@ public class Player extends StormCloudObject {
 
     public void setReady(boolean ready) {
         this.ready = ready;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        getRoom().removeObject(this);
+        this.room = room;
+        getRoom().addObject(this);
     }
 
 }
