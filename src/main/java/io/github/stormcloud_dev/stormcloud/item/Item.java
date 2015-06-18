@@ -13,19 +13,24 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+package io.github.stormcloud_dev.stormcloud.item;
 
-package io.github.stormcloud_dev.stormcloud.object;
+public abstract class Item {
 
-import io.github.stormcloud_dev.stormcloud.StormCloud;
+    private String name;
+    private String description;
 
-public class BlockNoSpawn extends StormCloudObject {
-
-    public BlockNoSpawn(StormCloud server, int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
-        super(server, x, y, name, locked, code, scaleX, scaleY, colour, rotation);
+    public Item(String name, String description) {
+        this.name = name;
+        this.description = description;
     }
 
-    public BlockNoSpawn(StormCloud server, int x, int y) {
-        super(server, x, y);
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
 }

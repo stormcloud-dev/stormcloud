@@ -14,18 +14,36 @@
  *   limitations under the License.
  */
 
-package io.github.stormcloud_dev.stormcloud.object;
+package io.github.stormcloud_dev.stormcloud;
 
-import io.github.stormcloud_dev.stormcloud.StormCloud;
+public class Configuration {
 
-public class BlockNoSpawn extends StormCloudObject {
+    private byte timeout;
+    private int maxPlayers;
+    private int port;
 
-    public BlockNoSpawn(StormCloud server, int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
-        super(server, x, y, name, locked, code, scaleX, scaleY, colour, rotation);
+    public byte getTimeout() {
+        return timeout;
     }
 
-    public BlockNoSpawn(StormCloud server, int x, int y) {
-        super(server, x, y);
+    public void setTimeout(byte timeout) {
+        this.timeout = timeout;
+    }
+
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    public void setMaxPlayers(int maxPlayers) {
+        this.maxPlayers = maxPlayers;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
 }

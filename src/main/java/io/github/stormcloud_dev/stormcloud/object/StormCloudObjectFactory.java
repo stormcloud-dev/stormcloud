@@ -15,13 +15,16 @@
  */
 package io.github.stormcloud_dev.stormcloud.object;
 
+import io.github.stormcloud_dev.stormcloud.StormCloud;
+import io.github.stormcloud_dev.stormcloud.object.effect.EffectStun;
+
 public class StormCloudObjectFactory {
 
-    public static StormCloudObject createObject(String objName, int x, int y) {
-        return createObject(objName, x, y, "", false, "", 1D, 1D, 4294967295L, 0D);
+    public static StormCloudObject createObject(StormCloud server, String objName, int x, int y) {
+        return createObject(server, objName, x, y, "", false, "", 1D, 1D, 4294967295L, 0D);
     }
 
-    public static StormCloudObject createObject(String objName, int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
+    public static StormCloudObject createObject(StormCloud server, String objName, int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
         switch (objName) {
             case "oAchievement": return null;
             case "oAcrid": return null;
@@ -50,7 +53,7 @@ public class StormCloudObjectFactory {
             case "oAssassinHit": return null;
             case "oAssassinPoke": return null;
             case "oAxe": return null;
-            case "oB": return new Block(x, y, name, locked, code, scaleX, scaleY, colour, rotation);
+            case "oB": return new Block(server, x, y, name, locked, code, scaleX, scaleY, colour, rotation);
             case "oBarrel1": return null;
             case "oBarrel2": return null;
             case "oBarrel3": return null;
@@ -81,7 +84,7 @@ public class StormCloudObjectFactory {
             case "oBlockDestroy": return null;
             case "oBlockDestroy2": return null;
             case "oBMove": return null;
-            case "oBNoSpawn": return new BlockNoSpawn(x, y, name, locked, code, scaleX, scaleY, colour, rotation);
+            case "oBNoSpawn": return new BlockNoSpawn(server, x, y, name, locked, code, scaleX, scaleY, colour, rotation);
             case "oBNoSpawn2": return null;
             case "oBNoSpawn3": return null;
             case "oBNoSpawnSkinny": return null;
@@ -108,7 +111,7 @@ public class StormCloudObjectFactory {
             case "oBossSkill1": return null;
             case "oBossSkill2": return null;
             case "oBossSkill2old": return null;
-            case "oBossSpawn": return new BossSpawn(x, y, name, locked, code, scaleX, scaleY, colour, rotation);
+            case "oBossSpawn": return new BossSpawn(server, x, y, name, locked, code, scaleX, scaleY, colour, rotation);
             case "oBossSpawn2": return null;
             case "oBossText": return null;
             case "oBot": return null;
@@ -238,7 +241,7 @@ public class StormCloudObjectFactory {
             case "oEfSparks": return null;
             case "oEfSpikestrip": return null;
             case "oEfSticky": return null;
-            case "oEfStun": return null;
+            case "oEfStun": return new EffectStun(server, x, y, name, locked, code, scaleX, scaleY, colour, rotation);
             case "oEfTargeting": return null;
             case "oEfThorns": return null;
             case "oEfTrail": return null;
@@ -423,7 +426,7 @@ public class StormCloudObjectFactory {
             case "oRiotGrenade2": return null;
             case "oRoe": return null;
             case "oRoot": return null;
-            case "oRope": return new Rope(x, y, name, locked, code, scaleX, scaleY, colour, rotation);
+            case "oRope": return new Rope(server, x, y, name, locked, code, scaleX, scaleY, colour, rotation);
             case "oSack": return null;
             case "oSawmerang": return null;
             case "oScarf": return null;

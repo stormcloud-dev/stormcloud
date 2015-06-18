@@ -15,6 +15,9 @@
  */
 package io.github.stormcloud_dev.stormcloud.room;
 
+import io.github.stormcloud_dev.stormcloud.StormCloud;
+import io.github.stormcloud_dev.stormcloud.event.game.ObjectCreateEvent;
+import io.github.stormcloud_dev.stormcloud.event.game.ObjectDestroyEvent;
 import io.github.stormcloud_dev.stormcloud.object.StormCloudObject;
 import io.github.stormcloud_dev.stormcloud.object.StormCloudObjectFactory;
 import org.w3c.dom.Document;
@@ -42,16 +45,18 @@ import static java.lang.String.format;
 
 public class Room {
 
+    private StormCloud server;
     private String name;
     private Set<StormCloudObject> objects;
 
-    public Room(String name) {
+    public Room(StormCloud server, String name) {
+        this.server = server;
         this.name = name;
         objects = new HashSet<>();
     }
 
-    public static Room load(String roomName) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
-        Room room = new Room(roomName);
+    public static Room load(StormCloud server, String roomName) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
+        Room room = new Room(server, roomName);
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document = builder.parse(Room.class.getResourceAsStream(format("/rooms/%s.xml", roomName)));
         XPath xPath = XPathFactory.newInstance().newXPath();
@@ -69,7 +74,7 @@ public class Room {
             double scaleY = parseDouble(attributes.getNamedItem("scaleY").getNodeValue());
             long colour = parseLong(attributes.getNamedItem("colour").getNodeValue());
             double rotation = parseDouble(attributes.getNamedItem("rotation").getNodeValue());
-            room.addObject(StormCloudObjectFactory.createObject(objName, x, y, name, locked, code, scaleX, scaleY, colour, rotation));
+            room.addObject(StormCloudObjectFactory.createObject(server, objName, x, y, name, locked, code, scaleX, scaleY, colour, rotation));
         }
         return room;
     }
@@ -80,16 +85,33 @@ public class Room {
 
     public void addObject(StormCloudObject object) {
         if (object == null || objects.contains(object)) return;
-        objects.add(object);
+        ObjectCreateEvent event = new ObjectCreateEvent(object);
+        server.getEventManager().onEvent(event);
+        if (!event.isCancelled()) {
+            objects.add(object);
+            object.setRoom(this);
+        }
     }
 
     public void removeObject(StormCloudObject object) {
         if (object == null || !objects.contains(object)) return;
-        objects.remove(object);
+        ObjectDestroyEvent event = new ObjectDestroyEvent(object);
+        server.getEventManager().onEvent(event);
+        if (!event.isCancelled()) {
+            objects.remove(object);
+            object.setRoom(this);
+        }
     }
 
     public Collection<StormCloudObject> getObjects() {
         return objects;
+    }
+
+    public boolean containsInstanceOf(Class<? extends StormCloudObject> type) {
+        for (StormCloudObject object : objects) {
+            if (type.isInstance(object)) return true;
+        }
+        return false;
     }
 
 }

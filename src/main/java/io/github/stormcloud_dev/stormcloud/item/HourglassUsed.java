@@ -13,19 +13,12 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+package io.github.stormcloud_dev.stormcloud.item;
 
-package io.github.stormcloud_dev.stormcloud.object;
+public class HourglassUsed extends Item {
 
-import io.github.stormcloud_dev.stormcloud.StormCloud;
-
-public class BlockNoSpawn extends StormCloudObject {
-
-    public BlockNoSpawn(StormCloud server, int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
-        super(server, x, y, name, locked, code, scaleX, scaleY, colour, rotation);
-    }
-
-    public BlockNoSpawn(StormCloud server, int x, int y) {
-        super(server, x, y);
+    public HourglassUsed() {
+        super("Hourglass (Used)", "");
     }
 
 }

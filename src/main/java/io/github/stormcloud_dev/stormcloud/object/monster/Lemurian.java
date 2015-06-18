@@ -13,19 +13,26 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+package io.github.stormcloud_dev.stormcloud.object.monster;
 
-package io.github.stormcloud_dev.stormcloud.object;
+public class Lemurian extends Monster {
 
-import io.github.stormcloud_dev.stormcloud.StormCloud;
-
-public class BlockNoSpawn extends StormCloudObject {
-
-    public BlockNoSpawn(StormCloud server, int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
-        super(server, x, y, name, locked, code, scaleX, scaleY, colour, rotation);
+    public Lemurian(int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
+        super(x, y, name, locked, code, scaleX, scaleY, colour, rotation);
+        setZRange(34);
+        initLemurian();
     }
 
-    public BlockNoSpawn(StormCloud server, int x, int y) {
-        super(server, x, y);
+    public Lemurian(int x, int y) {
+        super(x, y);
+        setZRange(34);
+        initLemurian();
+    }
+
+    private void initLemurian() {
+        setName("Lemurian");
+        setCanJump(true);
+        setDamage(14F * (float) Math.pow(getEnemyBuff(), getDamageCoefficient()));
     }
 
 }

@@ -15,10 +15,21 @@
  */
 package io.github.stormcloud_dev.stormcloud.object;
 
+import io.github.stormcloud_dev.stormcloud.StormCloud;
+import io.github.stormcloud_dev.stormcloud.alarm.AlarmManager;
+import io.github.stormcloud_dev.stormcloud.event.EventHandler;
+import io.github.stormcloud_dev.stormcloud.event.InvalidEventHandlerException;
+import io.github.stormcloud_dev.stormcloud.event.game.StepEvent;
+import io.github.stormcloud_dev.stormcloud.room.Room;
+
 import java.awt.*;
+
+import static java.util.logging.Level.SEVERE;
 
 public class StormCloudObject {
 
+    private StormCloud server;
+    private Room room;
     private int x;
     private int y;
     private String name;
@@ -28,8 +39,11 @@ public class StormCloudObject {
     private double scaleY;
     private Color colour;
     private double rotation;
+    private boolean existent; // Whether the instance exists in a room
+    private AlarmManager alarmManager;
 
-    public StormCloudObject(int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
+    public StormCloudObject(StormCloud server, int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
+        this.server = server;
         this.x = x;
         this.y = y;
         this.name = name;
@@ -39,10 +53,40 @@ public class StormCloudObject {
         this.scaleY = scaleY;
         this.colour = new Color((int) ((colour & 16711680) >> 16 | (colour & 65280) | (colour & 255) << 16));
         this.rotation = rotation;
+        alarmManager = new AlarmManager(server);
+        registerEvents();
     }
 
-    public StormCloudObject(int x, int y) {
-        this(x, y, "", false, "", 1D, 1D, 4294967295L, 0D);
+    public StormCloudObject(StormCloud server, int x, int y) {
+        this(server, x, y, "", false, "", 1D, 1D, 4294967295L, 0D);
+    }
+
+    private void registerEvents() {
+        try {
+            getServer().getEventManager().addListener(this);
+        } catch (InvalidEventHandlerException exception) {
+            getServer().getLogger().log(SEVERE, "Failed to register events for object", exception);
+        }
+    }
+
+    @EventHandler
+    public void onStep(StepEvent event) {
+        getAlarmManager().onStep();
+    }
+
+    public StormCloud getServer() {
+        return server;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        if (getRoom() != null) getRoom().removeObject(this);
+        this.room = room;
+        if (getRoom() != null) getRoom().addObject(this);
+        setExistent(getRoom() != null);
     }
 
     public int getX() {
@@ -121,4 +165,21 @@ public class StormCloudObject {
     public void setRotation(double rotation) {
         this.rotation = rotation;
     }
+
+    public boolean isExistent() {
+        return existent;
+    }
+
+    public void setExistent(boolean existent) {
+        this.existent = existent;
+    }
+
+    public AlarmManager getAlarmManager() {
+        return alarmManager;
+    }
+
+    public void destroy() {
+        setRoom(null);
+    }
+
 }

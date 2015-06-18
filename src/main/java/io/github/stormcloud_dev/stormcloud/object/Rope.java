@@ -16,14 +16,16 @@
 
 package io.github.stormcloud_dev.stormcloud.object;
 
+import io.github.stormcloud_dev.stormcloud.StormCloud;
+
 public class Rope extends StormCloudObject {
 
-    public Rope(int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
-        super(x, y, name, locked, code, scaleX, scaleY, colour, rotation);
+    public Rope(StormCloud server, int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
+        super(server, x, y, name, locked, code, scaleX, scaleY, colour, rotation);
     }
 
-    public Rope(int x, int y) {
-        super(x, y);
+    public Rope(StormCloud server, int x, int y) {
+        super(server, x, y);
     }
 
 }

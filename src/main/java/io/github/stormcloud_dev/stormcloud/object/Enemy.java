@@ -15,14 +15,16 @@
  */
 package io.github.stormcloud_dev.stormcloud.object;
 
+import io.github.stormcloud_dev.stormcloud.StormCloud;
+
 public class Enemy extends StormCloudObject {
 
     private double mId, objectIndex;
 
     private short hp;
 
-    public Enemy(double mId, double objectIndex, int x, int y) {
-        super(x, y);
+    public Enemy(StormCloud server, double mId, double objectIndex, int x, int y) {
+        super(server, x, y);
         this.mId = mId;
         this.objectIndex = objectIndex;
     }

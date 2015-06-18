@@ -14,18 +14,34 @@
  *   limitations under the License.
  */
 
-package io.github.stormcloud_dev.stormcloud.object;
+package io.github.stormcloud_dev.stormcloud.alarm;
 
 import io.github.stormcloud_dev.stormcloud.StormCloud;
 
-public class BlockNoSpawn extends StormCloudObject {
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-    public BlockNoSpawn(StormCloud server, int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
-        super(server, x, y, name, locked, code, scaleX, scaleY, colour, rotation);
+public class AlarmManager {
+
+    private List<Alarm> alarms;
+
+    public AlarmManager(StormCloud server) {
+        alarms = new CopyOnWriteArrayList<>();
+        for (int i = 0; i < 12; i++) {
+            alarms.add(new Alarm(server, i));
+        }
     }
 
-    public BlockNoSpawn(StormCloud server, int x, int y) {
-        super(server, x, y);
+    public List<Alarm> getAlarms() {
+        return alarms;
+    }
+
+    public Alarm getAlarm(int index)  {
+        return getAlarms().get(index);
+    }
+
+    public void onStep() {
+        getAlarms().parallelStream().forEach(Alarm::onTick);
     }
 
 }

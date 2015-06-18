@@ -14,18 +14,28 @@
  *   limitations under the License.
  */
 
-package io.github.stormcloud_dev.stormcloud.object;
+package io.github.stormcloud_dev.stormcloud.event.game;
 
-import io.github.stormcloud_dev.stormcloud.StormCloud;
+import io.github.stormcloud_dev.stormcloud.event.Event;
+import io.github.stormcloud_dev.stormcloud.object.StormCloudObject;
+import io.github.stormcloud_dev.stormcloud.room.Room;
 
-public class BlockNoSpawn extends StormCloudObject {
+public class OutsideRoomEvent extends Event {
 
-    public BlockNoSpawn(StormCloud server, int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
-        super(server, x, y, name, locked, code, scaleX, scaleY, colour, rotation);
+    private StormCloudObject object;
+    private Room room;
+
+    public OutsideRoomEvent(StormCloudObject object, Room room) {
+        this.object = object;
+        this.room = room;
     }
 
-    public BlockNoSpawn(StormCloud server, int x, int y) {
-        super(server, x, y);
+    public StormCloudObject getObject() {
+        return object;
+    }
+
+    public Room getRoom() {
+        return room;
     }
 
 }

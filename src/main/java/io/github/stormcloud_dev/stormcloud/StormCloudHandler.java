@@ -92,7 +92,7 @@ public class StormCloudHandler extends ChannelHandlerAdapter {
         server.getLogger().info("Channel active: " + ctx.channel());
         //Random random = new Random();
         //Multiplayer ID's are starting at 9
-        Player player = new Player(getPlayerId(9.0, ctx.channel().remoteAddress().toString().split(":")[0]), 210.0, ctx.channel().remoteAddress().toString().split(":")[0]);
+        Player player = new Player(server, getPlayerId(9.0, ctx.channel().remoteAddress().toString().split(":")[0]), 210.0, ctx.channel().remoteAddress().toString().split(":")[0]);
         player.setChannel(ctx.channel());
         ctx.channel().attr(PLAYER).set(player);
         channels.add(ctx.channel());

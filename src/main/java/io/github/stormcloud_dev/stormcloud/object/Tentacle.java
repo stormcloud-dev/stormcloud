@@ -18,13 +18,13 @@ package io.github.stormcloud_dev.stormcloud.object;
 
 import io.github.stormcloud_dev.stormcloud.StormCloud;
 
-public class BlockNoSpawn extends StormCloudObject {
+public class Tentacle extends StormCloudObject {
 
-    public BlockNoSpawn(StormCloud server, int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
+    public Tentacle(StormCloud server, int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
         super(server, x, y, name, locked, code, scaleX, scaleY, colour, rotation);
     }
 
-    public BlockNoSpawn(StormCloud server, int x, int y) {
+    public Tentacle(StormCloud server, int x, int y) {
         super(server, x, y);
     }
 
