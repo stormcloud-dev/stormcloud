@@ -22,6 +22,10 @@ import io.github.stormcloud_dev.stormcloud.event.InvalidEventHandlerException;
 import io.github.stormcloud_dev.stormcloud.event.game.StepEvent;
 import io.github.stormcloud_dev.stormcloud.room.Room;
 
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+
 import java.awt.*;
 
 import static java.util.logging.Level.SEVERE;
@@ -41,8 +45,10 @@ public class StormCloudObject {
     private double rotation;
     private boolean existent; // Whether the instance exists in a room
     private AlarmManager alarmManager;
+    private Body body;
+    private BodyType dynamic;
 
-    public StormCloudObject(StormCloud server, int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
+    public StormCloudObject(StormCloud server, int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation, Body body, BodyType dynamic) {
         this.server = server;
         this.x = x;
         this.y = y;
@@ -53,12 +59,13 @@ public class StormCloudObject {
         this.scaleY = scaleY;
         this.colour = new Color((int) ((colour & 16711680) >> 16 | (colour & 65280) | (colour & 255) << 16));
         this.rotation = rotation;
+        this.dynamic = dynamic;
         alarmManager = new AlarmManager(server);
         registerEvents();
     }
 
     public StormCloudObject(StormCloud server, int x, int y) {
-        this(server, x, y, "", false, "", 1D, 1D, 4294967295L, 0D);
+        this(server, x, y, "", false, "", 1D, 1D, 4294967295L, 0D, null, BodyType.DYNAMIC);
     }
 
     private void registerEvents() {
@@ -182,4 +189,12 @@ public class StormCloudObject {
         setRoom(null);
     }
 
+
+    public BodyType getDynamic() { return dynamic; }
+
+    public void setDynamic(BodyType btype) { this.dynamic = btype; }
+
+    public Body getBody() { return body; }
+
+    public void setBody(Body body) { this.body = body; }
 }

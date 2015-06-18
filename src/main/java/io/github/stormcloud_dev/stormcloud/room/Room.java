@@ -20,6 +20,10 @@ import io.github.stormcloud_dev.stormcloud.event.game.ObjectCreateEvent;
 import io.github.stormcloud_dev.stormcloud.event.game.ObjectDestroyEvent;
 import io.github.stormcloud_dev.stormcloud.object.StormCloudObject;
 import io.github.stormcloud_dev.stormcloud.object.StormCloudObjectFactory;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.World;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -47,12 +51,15 @@ public class Room {
 
     private StormCloud server;
     private String name;
+    private World world;
     private Set<StormCloudObject> objects;
 
     public Room(StormCloud server, String name) {
         this.server = server;
         this.name = name;
-        objects = new HashSet<>();
+        Vec2 gravity = new Vec2(0,-10);
+        this.world = new World(gravity);
+        this.objects = new HashSet<>();
     }
 
     public static Room load(StormCloud server, String roomName) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
@@ -91,6 +98,13 @@ public class Room {
             objects.add(object);
             object.setRoom(this);
         }
+        BodyDef bodyObject = new BodyDef();
+        bodyObject.type = object.getDynamic();
+        bodyObject.angle = (float) object.getRotation();
+        bodyObject.position.set(object.getX(), object.getY());
+        Body body = this.world.createBody(bodyObject);
+        object.setBody(body);
+        this.objects.add(object);
     }
 
     public void removeObject(StormCloudObject object) {
@@ -101,6 +115,8 @@ public class Room {
             objects.remove(object);
             object.setRoom(this);
         }
+        this.world.destroyBody(object.getBody());
+        this.objects.remove(object);
     }
 
     public Collection<StormCloudObject> getObjects() {
@@ -113,5 +129,4 @@ public class Room {
         }
         return false;
     }
-
 }
