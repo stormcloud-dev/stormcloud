@@ -17,6 +17,10 @@ package io.github.stormcloud_dev.stormcloud.room;
 
 import io.github.stormcloud_dev.stormcloud.object.StormCloudObject;
 import io.github.stormcloud_dev.stormcloud.object.StormCloudObjectFactory;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.World;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -43,11 +47,14 @@ import static java.lang.String.format;
 public class Room {
 
     private String name;
+    private World world;
     private Set<StormCloudObject> objects;
 
     public Room(String name) {
         this.name = name;
-        objects = new HashSet<>();
+        Vec2 gravity = new Vec2(0,-10);
+        this.world = new World(gravity);
+        this.objects = new HashSet<>();
     }
 
     public static Room load(String roomName) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
@@ -79,17 +86,23 @@ public class Room {
     }
 
     public void addObject(StormCloudObject object) {
-        if (object == null || objects.contains(object)) return;
-        objects.add(object);
+        if (object == null || this.objects.contains(object)) return;
+        BodyDef bodyObject = new BodyDef();
+        bodyObject.type = object.getDynamic();
+        bodyObject.angle = (float) object.getRotation();
+        bodyObject.position.set(object.getX(), object.getY());
+        Body body = this.world.createBody(bodyObject);
+        object.setBody(body);
+        this.objects.add(object);
     }
 
     public void removeObject(StormCloudObject object) {
-        if (object == null || !objects.contains(object)) return;
-        objects.remove(object);
+        if (object == null || !this.objects.contains(object)) return;
+        this.world.destroyBody(object.getBody());
+        this.objects.remove(object);
     }
 
     public Collection<StormCloudObject> getObjects() {
-        return objects;
+        return this.objects;
     }
-
 }

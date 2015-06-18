@@ -15,6 +15,10 @@
  */
 package io.github.stormcloud_dev.stormcloud.object;
 
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+
 import java.awt.*;
 
 public class StormCloudObject {
@@ -28,8 +32,10 @@ public class StormCloudObject {
     private double scaleY;
     private Color colour;
     private double rotation;
+    private Body body;
+    private BodyType dynamic;
 
-    public StormCloudObject(int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation) {
+    public StormCloudObject(int x, int y, String name, boolean locked, String code, double scaleX, double scaleY, long colour, double rotation, Body body, BodyType dynamic) {
         this.x = x;
         this.y = y;
         this.name = name;
@@ -39,10 +45,11 @@ public class StormCloudObject {
         this.scaleY = scaleY;
         this.colour = new Color((int) ((colour & 16711680) >> 16 | (colour & 65280) | (colour & 255) << 16));
         this.rotation = rotation;
+        this.dynamic = dynamic;
     }
 
     public StormCloudObject(int x, int y) {
-        this(x, y, "", false, "", 1D, 1D, 4294967295L, 0D);
+        this(x, y, "", false, "", 1D, 1D, 4294967295L, 0D, null, BodyType.DYNAMIC);
     }
 
     public int getX() {
@@ -121,4 +128,12 @@ public class StormCloudObject {
     public void setRotation(double rotation) {
         this.rotation = rotation;
     }
+
+    public BodyType getDynamic() { return dynamic; }
+
+    public void setDynamic(BodyType btype) { this.dynamic = btype; }
+
+    public Body getBody() { return body; }
+
+    public void setBody(Body body) { this.body = body; }
 }
